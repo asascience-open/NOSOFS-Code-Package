@@ -2,14 +2,14 @@
 #PBS  -N wcofs_da_obs_03
 #PBS  -A NOSOFS-DEV
 #PBS  -q devmax
-#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/wcofs_da_obs_03.out
-#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/wcofs_da_obs_03.err
+#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/wcofs_da_obs_03.out
+#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/wcofs_da_obs_03.err
 #PBS  -l place=vscatter,select=1:ncpus=1
 #PBS  -l walltime=1:30:00
 
-. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2/versions/run.ver
+. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.6/versions/run.ver
 
-RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.7.2
+RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.6.6
 WORKDIR=/lfs/h1/nos/ptmp/$LOGNAME/work/${nosofs_ver}/wcofs_da
 if [ ! -r $WORKDIR ]; then
   mkdir -p -m 755 $WORKDIR

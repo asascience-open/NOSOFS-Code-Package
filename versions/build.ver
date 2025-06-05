@@ -1,5 +1,5 @@
 #OFS version
-export nosofs_ver=v3.6.0
+export nosofs_ver=v3.6.6
 
 # Environment
 export envvars_ver=1.0

@@ -695,6 +695,29 @@ SUBROUTINE INTERNAL_STEP
 
 #   endif
 
+!--->qxu velocity_limit@ 20231004
+     DO I=1,N
+        DO K=1,KBM1
+!           if(isnan(uf(i,k)))write(921,*) iint,egid(i),k
+!           if(isnan(vf(i,k)))write(922,*) iint,egid(i),k
+          ! UF(I,K)=min(max(UF(I,K),-5.0),5.0)
+          ! VF(I,K)=min(max(VF(I,K),-5.0),5.0)
+          UF(I,K)=UF(I,K) / max(1.0,sqrt(UF(I,K)**2+VF(I,K)**2)/5.0)
+          VF(I,K)=VF(I,K) / max(1.0,sqrt(UF(I,K)**2+VF(I,K)**2)/5.0)
+
+          ! lwang
+           if((yc(i)+Vymin>=113210.0) .and. (xc(i)+VXmin>=920543.0) .and. (xc(i)+VXmin<=922429.0) .and. (yc(i)+Vymin<=115355.0)) then
+           UF(I,K)=min(max(UF(I,K),-3.0),3.0)
+           VF(I,K)=min(max(VF(I,K),-3.0),3.0)
+           endif
+! lwang
+        END DO
+     END DO
+!<----qxu
+
+
+
+
 #   if defined (NH)
     CALL ADV_W
     CALL VDIF_W
@@ -983,6 +1006,99 @@ SUBROUTINE INTERNAL_STEP
     CALL GEN_POISSON
     CALL UPDATE_QUVW
 #   endif
+
+
+! --->qxu velocity limit control for NECOFSv1 forecast to use a bigger time step
+!! Lu Wang, velocity@20230821
+!    DO I=1,N
+!       DO K=1,KBM1
+!          UF(I,K)=UF(I,K) / max(1.0,sqrt(UF(I,K)**2+VF(I,K)**2)/4.0)
+!          VF(I,K)=VF(I,K) / max(1.0,sqrt(UF(I,K)**2+VF(I,K)**2)/4.0)
+!          !tail of Delaware river
+!          if (yc(i)+vymin>=-360000.0 .and. yc(i)+vymin<=-270000.0 .and. xc(i)+vxmin>=410000.0 .and. xc(i)+vxmin<=520000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)   !1.5-->1.0  by 05/06/2024
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)   !1.5-->1.0
+!          endif
+!!          !tail_1 of Delaware river
+!          if (yc(i)+vymin>=-312835.0 .and. yc(i)+vymin<=-312145.0 .and. xc(i)+vxmin>=475733.0 .and. xc(i)+vxmin<=476170.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8) 
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)  
+!          endif
+
+!          if (yc(i)+vymin>=-213800.0 .and. yc(i)+vymin<=-212600.0 .and. xc(i)+vxmin>=703000.0 .and. xc(i)+vxmin<=703400.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!!NY
+!           if (yc(i)+vymin>=-250000.0 .and. yc(i)+vymin<=-190000.0 .and. xc(i)+vxmin>=550000.0 .and. xc(i)+vxmin<=590000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!          if (yc(i)+vymin>=-379600.0 .and. yc(i)+vymin<=-378800.0 .and. xc(i)+vxmin>=524500.0 .and. xc(i)+vxmin<=525500.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!          endif
+!          if (yc(i)+vymin>=-352000.0 .and. yc(i)+vymin<=-349000.0 .and. xc(i)+vxmin>=427000.0 .and. xc(i)+vxmin<=433000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!          endif
+!          if (yc(i)+vymin>=-274000.0 .and. yc(i)+vymin<=-263000.0 .and. xc(i)+vxmin>=566000.0 .and. xc(i)+vxmin<=576600.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!          if (yc(i)+vymin>=-70000.0 .and. yc(i)+vymin<=10000.0 .and. xc(i)+vxmin>=580000.0 .and. xc(i)+vxmin<=620000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!          !Delavare river
+!          if (yc(i)+vymin>=-320000.0 .and. yc(i)+vymin<=-280000.0 .and. xc(i)+vxmin>=460000.0 .and. xc(i)+vxmin<=520000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!          !Merrimack river qxu add by 21/12/2023
+!          if (yc(i)+vymin>=-1613.0 .and. yc(i)+vymin<=1730.0 .and. xc(i)+vxmin>=837000.0 .and. xc(i)+vxmin<=843000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/0.8)
+!          endif
+!          !end of NY river qxu add by 21/12/2023
+!          if (yc(i)+vymin>=-7674.0 .and. yc(i)+vymin<=-2900.0 .and. xc(i)+vxmin>=610000.0 .and. xc(i)+vxmin<=612200.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+
+!          !Chaeles river qxu add by 15/02/2024
+!          if (yc(i)+vymin>=-52000.0 .and. yc(i)+vymin<=-50500.0 .and. xc(i)+vxmin>=825000.0 .and. xc(i)+vxmin<=827000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!          endif
+!          !Capcod canal qxu add by 15/02/2024
+!          if (yc(i)+vymin>=-125000.0 .and. yc(i)+vymin<=-115000.0 .and. xc(i)+vxmin>=860000.0 .and. xc(i)+vxmin<=873000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/2.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/2.0)
+!          endif
+!          !Menauhant beach qxu add by 20/03/2024
+!          if (yc(i)+vymin>=-145000.0 .and. yc(i)+vymin<=-139000.0 .and. xc(i)+vxmin>=865000.0 .and. xc(i)+vxmin<=875000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!          endif
+          
+!          !delava river end  qxu add by 06/05/2024
+!          if (yc(i)+vymin>=-300000.0 .and. yc(i)+vymin<=-280000.0 .and. xc(i)+vxmin>=500000.0 .and. xc(i)+vxmin<=512000.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.0)
+!          endif
+!          !great bay qxu add by 07/25/2024
+!          if (yc(i)+vymin>=27000.0 .and. yc(i)+vymin<=28500.0 .and. xc(i)+vxmin>=851000.0 .and. xc(i)+vxmin<=853500.0) then
+!             UF(I,K)=UF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!             VF(I,K)=VF(I,K) / max(1.0, sqrt(UF(I,K)**2+VF(I,K)**2)/1.5)
+!          endif
+
+
+
+!       ENDDO
+!    ENDDO
+! <---
+
 
     CALL UPDATES_SEMI
     DO I=1,IOBCN            ! do linear T/S case, must redo this part, carefule!
@@ -1336,6 +1452,13 @@ SUBROUTINE INTERNAL_STEP
          .OR. SSHGRD_ASSIM .OR. TSGRD_ASSIM))CALL TEMP_ASSIMILATION
      END IF
 #    endif
+
+
+!--->qxu added for temperature limit
+WHERE(TF1 < -1.5_SP)TF1=-1.5_SP !YSUN APR 20 2011
+WHERE(TF1 > 37.0_SP)TF1=37.0_SP !YSUN MAY 5 2011
+!<---
+
 
 !     IF(NESTING_ON )THEN
 !       CALL SET_VAR(intTime,T1=TF1)

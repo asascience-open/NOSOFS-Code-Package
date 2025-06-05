@@ -214,7 +214,7 @@ if [ $DBASE_TS == 'RTOFS' ]; then
     reg="alaska"
   fi
   NCEPPRODDIR=${COMINrtofs_3d}'/rtofs.'$YYYY$MM$DD
-  N  FILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc | wc -l`
+  NFILE9=`find  ${NCEPPRODDIR} -name "rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc" | wc -l`
   if [ $NFILE9 -le 0 ]; then
       echo "WARNING: there is no RTOFS product found"
       echo "use HYCOM as backup"
@@ -222,17 +222,19 @@ if [ $DBASE_TS == 'RTOFS' ]; then
 #        export maillist='nos.co-ops.modelingteam@noaa.gov'
 #      fi
 #      export maillist=${maillist:-'nco.spa@noaa.gov,nos.co-ops.modelingteam@noaa.gov'}
-      export subject="WARNING COULD NOT FOUND RTOFS FILE for $PDY t${cyc}z $job"
+      export subject="FATAL ERROR COULD NOT FOUND RTOFS FILE for $PDY t${cyc}z $job"
       echo "*************************************************************" > mailmsg
-       echo "*** WARNING !! COULD NOT FIND RTOFS FILES  *** " >> mailmsg
+       echo "*** FATAL ERROR !! COULD NOT FIND RTOFS FILES  *** " >> mailmsg
        echo "*************************************************************" >> mailmsg
        echo >> mailmsg
        echo "   $NCEPPRODDIR " >> mailmsg
-       echo " backup HYCOM is used "  >> mailmsg
+#       echo " backup HYCOM is used "  >> mailmsg
        echo >> mailmsg
        echo "check availability of RTOFS FILE " >> mailmsg
+       echo " $OFS is terminated " >> mailmsg
        cat mailmsg > $COMOUT/${RUN}.t${cyc}z.rtofs.emailbody
        cat $COMOUT/${RUN}.t${cyc}z.rtofs.emailbody | mail.py -s "$subject" $maillist -v
+       err=1;export err;err_chk
   fi
   FILESIZE=260000000
   if [ $reg == "US_east" ]; then
@@ -252,7 +254,7 @@ if [ $DBASE_TS == 'RTOFS' ]; then
      rm -f  RTOFS_FILE
   fi  
   NCEPPRODDIR=${COMINrtofs_3d}'/rtofs.'$YYYY$MM$DD
-  NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc | wc -l`
+  NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc" | wc -l`
   if [ $NFILE9 -le 0 ]; then
     echo 'No 3D RTOFS is found in '${NCEPPRODDIR}
     CURRENTTIME=`$NDATE -24 $CURRENTTIME`
@@ -260,7 +262,7 @@ if [ $DBASE_TS == 'RTOFS' ]; then
     MM=`echo $CURRENTTIME |cut -c5-6 `
     DD=`echo $CURRENTTIME |cut -c7-8 `
     NCEPPRODDIR=${COMINrtofs_3d}'/rtofs.'$YYYY$MM$DD
-    NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc | wc -l`
+    NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc" | wc -l`
     if [ $NFILE9 -le 0 ]; then
       echo 'No 3D RTOFS is found in '${NCEPPRODDIR}
       CURRENTTIME=`$NDATE -24 $YYYY$MM${DD}00 `
@@ -268,7 +270,7 @@ if [ $DBASE_TS == 'RTOFS' ]; then
       MM=`echo $CURRENTTIME |cut -c5-6 `
       DD=`echo $CURRENTTIME |cut -c7-8 `
       NCEPPRODDIR=${COMINrtofs_3d}'/rtofs.'$YYYY$MM$DD
-      NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc | wc -l`
+      NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_3dz_f*_6hrly_hvr_${reg}.nc" | wc -l`
     fi
   fi
   while [ $CURRENTTIME -le $TIME_NOW ]
@@ -390,7 +392,7 @@ if [ $DBASE_TS == 'HYCOM' ]; then
   NCOM_PRE_TIDE="hycom_glb_${reg}_tides_"
 
   NCEPPRODDIR=${COMTMP}'/'$YYYY$MM$DD/wgrdbul/navy_hycom
-  NFILE9=`ls -l ${NCEPPRODDIR}/${NCOM_PRE}*.nc.gz | wc -l`
+  NFILE9=`find ${NCEPPRODDIR} -name "${NCOM_PRE}*.nc.gz" | wc -l`
   if [ $NFILE9 -le 35 ]; then  #to forecast hour 72
     echo 'Not enough 3D HYCOM files are found in '${NCEPPRODDIR}
     CURRENTTIME=`$NDATE -24 $CURRENTTIME`
@@ -398,7 +400,7 @@ if [ $DBASE_TS == 'HYCOM' ]; then
     MM=`echo $CURRENTTIME |cut -c5-6 `
     DD=`echo $CURRENTTIME |cut -c7-8 `
     NCEPPRODDIR=${COMTMP}'/'$YYYY$MM$DD/wgrdbul
-    NFILE9=`ls -l ${NCEPPRODDIR}/${NCOM_PRE}*.nc.gz | wc -l`
+    NFILE9=`find ${NCEPPRODDIR} -name "${NCOM_PRE}*.nc.gz" | wc -l`
     if [ $NFILE9 -le 35 ]; then # to forecast hour 96 of previous day
       echo 'Not enough 3D HYCOM files are found in '${NCEPPRODDIR}
       CURRENTTIME=`$NDATE -24 $YYYY$MM${DD}00 `
@@ -406,7 +408,7 @@ if [ $DBASE_TS == 'HYCOM' ]; then
       MM=`echo $CURRENTTIME |cut -c5-6 `
       DD=`echo $CURRENTTIME |cut -c7-8 `
       NCEPPRODDIR=${COMTMP}'/'$YYYY$MM$DD/wgrdbul
-      NFILE9=`ls -l ${NCEPPRODDIR}/${NCOM_PRE}*.nc.gz | wc -l`
+      NFILE9=`find ${NCEPPRODDIR} -name "${NCOM_PRE}*.nc.gz" | wc -l`
     fi
   fi
   while [ $CURRENTTIME -le $TIME_NOW ]
@@ -617,7 +619,7 @@ if [ $DBASE_WL == RTOFS ]; then
   fi  
   NCEPPRODDIR=${COMINrtofs_2d}'/rtofs.'$YYYY$MM$DD
 #  NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_2ds_f*_3hrly_diag.nc | wc -l`
-  NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_2ds_f*_diag.nc | wc -l`
+  NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_2ds_f*_diag.nc" | wc -l`
   if [ $NFILE9 -le 0 ]; then
     echo 'No 2D RTOFS is found in '${NCEPPRODDIR}
     CURRENTTIME=`$NDATE -24 $CURRENTTIME`
@@ -625,7 +627,7 @@ if [ $DBASE_WL == RTOFS ]; then
     MM=`echo $CURRENTTIME |cut -c5-6 `
     DD=`echo $CURRENTTIME |cut -c7-8 `
     NCEPPRODDIR=${COMINrtofs_2d}'/rtofs.'$YYYY$MM$DD
-    NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_2ds_f*_diag.nc | wc -l`
+    NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_2ds_f*_diag.nc" | wc -l`
     if [ $NFILE9 -le 0 ]; then
       echo 'No 2D RTOFS is found in '${NCEPPRODDIR}
       CURRENTTIME=`$NDATE -24 $YYYY$MM${DD}00 `
@@ -633,7 +635,7 @@ if [ $DBASE_WL == RTOFS ]; then
       MM=`echo $CURRENTTIME |cut -c5-6 `
       DD=`echo $CURRENTTIME |cut -c7-8 `
       NCEPPRODDIR=${COMINrtofs_2d}'/rtofs.'$YYYY$MM$DD
-      NFILE9=`ls -l ${NCEPPRODDIR}/rtofs_glo_2ds_f*_diag.nc | wc -l`
+      NFILE9=`find ${NCEPPRODDIR} -name "rtofs_glo_2ds_f*_diag.nc" | wc -l`
     fi
   fi
   while [ $CURRENTTIME -le $TIME_NOW ]
@@ -846,20 +848,20 @@ if [ "${OFS,,}" != "creofs" ]; then
      MM=`echo $TIME_START | cut -c5-6 `
      DD=`echo $TIME_START | cut -c7-8 `
      HH=`echo $TIME_START | cut -c9-10 `
-   OBC_FORCING_FILE_LAST=${PREFIXNOS}.obc.${YYYY}${MM}${DD}.t${HH}z.nc
+   OBC_FORCING_FILE_LAST=${PREFIXNOS}.t${HH}z.${YYYY}${MM}${DD}.obc.nc
    if [ "${OFS,,}" == "wcofs_da" ]; then
       TIME_LC=`$NDATE +48 $TIME_START`
       YYYY=`echo $TIME_LC | cut -c1-4 `
       MM=`echo $TIME_LC | cut -c5-6 `
       DD=`echo $TIME_LC | cut -c7-8 `
       HH=`echo $TIME_LC | cut -c9-10 `
-      OBC_FORCING_FILE_LAST=${PREFIXNOS}.obc.${YYYY}${MM}${DD}.t${HH}z.nc
+      OBC_FORCING_FILE_LAST=${PREFIXNOS}.t${HH}z.${YYYY}${MM}${DD}.obc.nc
    fi
    if [ -s ${COMOUTroot}/${OFS}.$YYYY$MM$DD/$OBC_FORCING_FILE_LAST ]; then
       cp -p ${COMOUTroot}/${OFS}.$YYYY$MM$DD/$OBC_FORCING_FILE_LAST $DATA/.
    fi  
 else
-   OBC_FORCING_FILE_LAST=${PREFIXNOS}.obc.${YYYY}${MM}${DD}.t${HH}z.tar
+   OBC_FORCING_FILE_LAST=${PREFIXNOS}.t${HH}z.${YYYY}${MM}${DD}.obc.tar
 fi    
 COMTMP=${COMTMP:-FakeOBSDIR}
 BIO_MODULE=${BIO_MODULE:-0}

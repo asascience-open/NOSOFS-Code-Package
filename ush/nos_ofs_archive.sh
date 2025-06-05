@@ -124,7 +124,7 @@ then
          fi
        done
      fi
-       for combinefields in `ls $COMOUT/${PREFIXNOS}.${cycle}.${PDY}.fields.n*.nc`
+       for combinefields in `find $COMOUT -name "${PREFIXNOS}.${cycle}.${PDY}.fields.n*.nc"`
        do
          if [ -f ${combinefields} ]
          then

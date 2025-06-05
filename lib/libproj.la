@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/lfs/h1/nos/nosofs/noscrub/aijun.zhang/packages/nosofs.v3.6.0/sorc/FVCOM.fd/FVCOM_source/libs/proj.4-master/lib64'
+libdir='/lfs/h1/nos/nosofs/noscrub/aijun.zhang/packages/nosofs.v3.6.6/sorc/FVCOM.fd/FVCOM_source/libs/proj.4-master/lib64'

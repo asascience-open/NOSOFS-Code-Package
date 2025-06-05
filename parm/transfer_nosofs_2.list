@@ -23,26 +23,18 @@
 # directory are included, so if no exclude patterns match that file, it will be
 # transferred.
 
+_COMROOT_/nosofs/_SHORTVER_/ngofs2._PDY_/
 
-_COMROOT_/nosofs/_SHORTVER_/ciofs._PDY_/
+_COMROOT_/nosofs/_SHORTVER_/sfbofs._PDY_/
+
+_COMROOT_/nosofs/_SHORTVER_/sscofs._PDY_/
 
 # This directory is a good candidate for compression
 #Z
 
-_COMROOT_/nosofs/_SHORTVER_/lmhofs._PDY_/
+_COMROOT_/nosofs/_SHORTVER_/ngofs2._PDYm1_/
 
-_COMROOT_/nosofs/_SHORTVER_/loofs._PDY_/
+_COMROOT_/nosofs/_SHORTVER_/sfbfs._PDYm1_/
 
-_COMROOT_/nosofs/_SHORTVER_/lsofs._PDY_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/ciofs._PDYm1_/
-
-_COMROOT_/nosofs/_SHORTVER_/lmhofs._PDYm1_/
-
-_COMROOT_/nosofs/_SHORTVER_/loofs._PDYm1_/
-
-_COMROOT_/nosofs/_SHORTVER_/lsofs._PDYm1_/
-
-
+_COMROOT_/nosofs/_SHORTVER_/sscofs._PDYm1_/
 

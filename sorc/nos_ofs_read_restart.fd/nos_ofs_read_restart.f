@@ -25,7 +25,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       character*120 START_TIME, END_TIME
       CHARACTER globalstr(9)*120
       real*8 jday_start,jdaye,jbase_date,JULIAN,yearb,monthb,dayb,hourb
-      real*8 jday,jday0
+      real*8 jday,jday0,day_hotrestart,day_start,ocean_time
       real, allocatable :: zeta  (:,:,:)
       real, allocatable :: ubar  (:,:,:)
       real, allocatable :: vbar  (:,:,:)
@@ -57,7 +57,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       real, allocatable :: tmp1d  (:)
       real, allocatable :: tmp2d  (:,:)
       real, allocatable :: tmp3d  (:,:,:)
-      real, allocatable :: tmp4d  (:,:,:,:)
+      real*8, allocatable :: tmp4d  (:,:,:,:)
       real, allocatable :: tmp5d  (:,:,:,:,:)
       integer dimids(5),COUNT(5),DIMS(5),STATUS
       LOGICAL FEXIST,CHANGE_TIME
@@ -95,7 +95,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       monthb=IMMS
       dayb=IDDS
       hourb=IHHS   
-      day_start=JULIAN(yearb,monthb,dayb,hourb)-jbase_date
+      day_start=dble(JULIAN(yearb,monthb,dayb,hourb)-jbase_date)
       OPEN(10,file=trim(FOUT))
       print *,'FIN=',TRIM(FIN)
       INQUIRE(FILE=trim(FIN),EXIST=FEXIST)
@@ -120,7 +120,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
          ocean_time=-999.99
          GOTO 20
       ENDIF	
-       
+
       IF (ALLOCATED(tmp4d)) DEALLOCATE(tmp4d)
       IF (ALLOCATED(time)) DEALLOCATE(time)
       ALLOCATE(tmp4d(DIMS(1),DIMS(2),DIMS(3),DIMS(4)) )
@@ -139,6 +139,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       ENDDO
       ENDDO
       ENDDO
+
 !      if(ocean_time .GT. 0.0)ocean_time=ocean_time/86400.0
       ANAME='units'
       CALL READ_NETCDF(FIN,VNAME,ANAME,NDIM,DIMS,TMP4D,ATT,6,STATUS)
@@ -158,12 +159,14 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       LUNITS=INDEX(BUFFER,'seconds')
       IF(LUNITS .GT. 0)THEN
         if(ocean_time .GT. 0.0)ocean_time=ocean_time/86400.0
-      ENDIF 	
+      ENDIF
+
       LUNITS=INDEX(BUFFER,'SECONDS')
       IF(LUNITS .GT. 0)THEN
         if(ocean_time .GT. 0.0)ocean_time=ocean_time/86400.0
       ENDIF 	
-        
+      write(*,*) 'ocean_time d: ',ocean_time
+
       print *,'base_date of ocean_time=',IYR,IMM,IDD,IHH
       print *,IYR,base_date(1)
       print *,IMM,base_date(2)
@@ -182,7 +185,9 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
         ocean_time=JULIAN(yearb,monthb,dayb,hourb)+ocean_time
      &       -jbase_date
 	CHANGE_TIME=.TRUE.
-      ENDIF	
+      ENDIF
+      write(*,*) 'ocean_time e: ',ocean_time
+
 20    CONTINUE
       VNAME='ntimes'
       CALL READ_NETCDF(FIN,VNAME,ANAME,NDIM,DIMS,TMP4D,ATT,0,STATUS)
@@ -198,7 +203,7 @@ C -L/gpfs/c2/home/wx21az/netcdf-3.6.2/lib -lnetcdf -o nos_ofs_read_restart
       ENDIF
 30    CONTINUE
 !      PRINT *,trim(VNAME),ocean_time,NTIMES
-      day_hotrestart=ocean_time 
+      day_hotrestart=dble(ocean_time) 
       print *,'Time in initial file=',day_hotrestart
       print *,'Time of simulation end=  ',day_start
       IF ( (day_start-day_hotrestart) .LE. 0.0 )THEN
@@ -219,6 +224,7 @@ C	CHANGE_TIME=.TRUE.
 C	COLD_START="T"
          ntimes=0
       ENDIF
+
       IF(CHANGE_TIME)THEN
          STATUS = NF_OPEN(trim(FIN),NF_WRITE, NCID)
          IF (TRIM(OCEAN_MODEL) .eq. "ROMS" )THEN
@@ -425,7 +431,8 @@ C	COLD_START="T"
 300        CONTINUE	   
          ENDIF
          STATUS=NF_CLOSE(NCID)
-      ENDIF   
+      ENDIF
+
       jday=day_hotrestart+jbase_date
       call GREGORIAN(jday,yearb,monthb,dayb,hourb)
       IYR=INT(yearb)
@@ -462,6 +469,7 @@ C	COLD_START="T"
       tide_start=JULIAN(yearb,monthb,dayb,hourb)-jbase_date
       write(*,*)TRIM(COLD_START)
       WRITE(*,*)CHANGE_TIME
+      write(*,*) 'cc:',day_hotrestart
       WRITE(10,100)IYR,IMM,IDD,IHH,NTIMES,day_hotrestart,
      1 tide_start 
 !      WRITE(10,100)IYR,IMM,IDD,IHH,NTIMES,day_hotrestart,'d0'
@@ -488,7 +496,7 @@ C -------------------------------------------------------------------
       include 'netcdf.inc'
       character*120 FIN,VNAME,ANAME,BUFFER
       INTEGER DIMS(5),MODE,dimids(5),COUNT(5),STATUS
-      REAL TMP4D(DIMS(1),DIMS(2),DIMS(3),DIMS(4) )
+      REAL*8 TMP4D(DIMS(1),DIMS(2),DIMS(3),DIMS(4) )
       LOGICAL FEXIST
       integer, allocatable :: ITMP4D(:,:,:,:)
 
@@ -540,7 +548,7 @@ C -------------------------------------------------------------------
                write(*,*)'DIMS(',I,')= ',DIMS(I),ndims
 	     ENDIF  
            enddo
-           STATUS = NF_GET_VAR_REAL(NCID,IDVAR,TMP4D)
+           STATUS = NF_GET_VAR_DOUBLE(NCID,IDVAR,TMP4D)
            STATUS=NF_CLOSE(NCID)
          ENDIF
 

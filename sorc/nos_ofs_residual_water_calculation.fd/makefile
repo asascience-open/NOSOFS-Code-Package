@@ -1,19 +1,23 @@
-SHELL=/bin/sh
-#
+#! /bin/bash 
+#############################################################
+#Makefile for  nos_ofs_residual_water_calculation
+# Use:
+# make - build the executable
+# make DEBUG=full - build the executalbe with debug options
+# make install - move the built executable into the $LIBnos dir
+# make clean - start with a clean slate
+############################################################
+# Tunable parameters:
+# FC Name of the FORTRAN compiling system to use
+# LDFLAGS Options of the loader
+# FFLAGS Options of the compiler
+# DEBUG Options of the compiler included for debugging
+# LIBS List of libraries
+# CMD Name of the executable
 #
 SRCS=nos_ofs_residual_water_calculation.f
 
 OBJS=nos_ofs_residual_water_calculation.o
-
-## specify NetCDF directory use netcdf 4.0.1 zaj 07/24/2009
- EXECnos=../../exec
- LIBnos=../../lib
-# Tunable parameters
-# FC		Name of the fortran compiling system to use
-# LDFLAGS	Flags to the loader
-# LIBS		List of libraries
-# CMD		Name of the executable
-# PROFLIB	Library needed for profiling
 
 FC =           $(COMP_F) 
 #use for extensive compilation error reporting
@@ -28,18 +32,12 @@ NETCDF_LIB = -L$(NETCDF)/lib -lnetcdff
 NOS_UTILITY_LIB = -L$(LIBnos) -lnosutil
 INCS  = $(INC) $(NETCDF_INC)
 
-
 LIB  =   ${G2_LIB4} ${W3NCO_LIB4} ${W3EMC_LIB4} ${BUFR_LIB4}\
    $(NOS_UTILITY_LIB) ${JASPER_LIB} ${PNG_LIB}  ${Z_LIB4} ${BACIO_LIB4}
 
-
-
-
 LIBS  = $(NETCDF_LIB) $(LIB)
 
-
-
-CMD =            $(EXECnos)/nos_ofs_residual_water_calculation 
+CMD =            nos_ofs_residual_water_calculation 
 PROFLIB =       -lprof
 
 # To perform the default compilation, use the first line
@@ -47,9 +45,9 @@ PROFLIB =       -lprof
 # To compile giving profile additonal information, use the third line
 # WARNING:  SIMULTANEOUSLY PROFILING AND FLOWTRACING IS NOT RECOMMENDED
 FFLAGS =     -O3 -extend-source $(INCS)
-#FFLAGS =        -O3 -qnosave -qport=mod -qintsize=4 -qrealsize=4
-#FFLAGS =	 -F
-#FFLAGS =	 -Wf"-ez"
+ifeq ($(DEBUG),full)
+        FFLAGS = -DDEBUG -g -O0 -traceback -check all -extend-source $(INCS)
+endif
 
 # Lines from here on down should not need to be changed.  They are the
 # actual rules which make uses to build a.out.
@@ -60,6 +58,8 @@ $(CMD):		$(OBJS)
 	$(FC) $(LDFLAGS)  -o $(@) $(OBJS) $(LIBS)
 	rm -f $(OBJS)
 #	cp -p  $(CMD) ../../exec/
+install:
+	cp -p $(CMD) $(EXECnos)/.
 
 # Make the profiled version of the command and call it a.out.prof
 

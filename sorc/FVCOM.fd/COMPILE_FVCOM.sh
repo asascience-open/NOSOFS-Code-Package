@@ -66,42 +66,49 @@ then
 fi
 set -x
 
-cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/julian
-gmake clean
-gmake -f makefile
-if [ -s libjulian.a ]; then
-  cp -p libjulian.a $LIBnos
-else
-  echo "WARNING: libjulian.a was not created"
-fi
-rm -f *.o
-cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
-gmake clean
-./configure CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
-gmake
-gmake install
-if [ -s ./lib64/libproj.a ]; then
-  cp -p ./lib64/libproj.a $LIBnos
-else
- echo "WARNING: ./lib64/libproj.a was not created"
-fi
+#cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/julian
+#gmake clean
+#gmake -f makefile
 
-cd $SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
-gmake clean
-./configure  CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' proj4=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
-gmake
-gmake install
-if [ -s ./lib64/libfproj4.a ]; then
-  cp -p ./lib64/libfproj4.a $LIBnos
-else
-  echo "WARNING: ./lib/libfproj4.a was not created"
-fi
+#if [ -s libjulian.a ]; then
+#  cp -p libjulian.a $LIBnos
+#else
+#  echo "WARNING: libjulian.a was not created"
+#fi
+#rm -f *.o
+#cd  $SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
+#gmake clean
+#./configure CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master
+#gmake
+#gmake install
+#if [ -s ./lib64/libproj.a ]; then
+#  cp -p ./lib64/libproj.* $LIBnos
+#else
+# echo "WARNING: ./lib64/libproj.a was not created"
+#fi
 
-
-#export PETSC_DIR=/lfs/h1/nos/nosofs/noscrub/aijun.zhang/packages/noslibs.fd/petsc-3.20.0/3.20.0
-
+#cd $SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
+#gmake clean
+#./configure  CC=cc FC=ftn CFLAGS='-DIFORT -g -w -O2' proj4=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj.4-master --prefix=$SORCnos/FVCOM.fd/FVCOM_source/libs/proj4-fortran-master
+#gmake
+#gmake install
+#if [ -s ./lib64/libfproj4.a ]; then
+#  cp -p ./lib64/libfproj4.a $LIBnos
+#else
+#  echo "WARNING: ./lib/libfproj4.a was not created"
+#fi
 
 cd $SORCnos/FVCOM.fd/FVCOM_source
+
+gmake clean
+gmake -f makefile_necofs
+if [ -s  fvcom_necofs ]; then
+	  mv fvcom_necofs $EXECnos/.
+  else
+	    echo 'necofs fvcom executable is not created'
+fi
+
+exit
 
 gmake clean
 gmake -f makefile_NGOFS2

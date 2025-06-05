@@ -72,7 +72,8 @@ for satName in sats:
     read_lonlat = 1
     ngranules = 0
 
-    files=glob.glob(inDatDir+ftail)
+#  Modified by Zheng by adding the "sorted" on 01/03/2025
+    files=sorted(glob.glob(inDatDir+ftail))
     for fname in files:
         print('checking ' + ' ' + fname)
         if ( os.path.isfile(fname) | uri_validator(fname) ):

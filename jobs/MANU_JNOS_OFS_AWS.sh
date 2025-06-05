@@ -14,7 +14,7 @@ set -xa
 # #  Platform - ptmp for envir=dev; it is a dummy augment if envir=prod;
 #
 export PACKAGEROOT=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages
-. $PACKAGEROOT/nosofs.v3.7.2/versions/run.ver
+. $PACKAGEROOT/nosofs.v3.6.0/versions/run.ver
 export DATAROOT=/lfs/h1/nos/ptmp/$LOGNAME/work/${nosofs_ver}/${OFS}
 
 module purge

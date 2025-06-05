@@ -2,16 +2,16 @@
 #PBS  -N ngofs2_aws_15
 #PBS  -A NOSOFS-DEV
 #PBS  -q dev_transfer
-#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/ngofs2_aws_15.out
-#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/ngofs2_aws_15.err
+#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/ngofs2_aws_15.out
+#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/ngofs2_aws_15.err
 #PBS  -l place=vscatter,select=1:ncpus=8
 #PBS  -l walltime=0:50:00
 ##export NODES=1
 ##export LSB_MAX_NUM_PROCESSORS=$(($NODES*128))
 
-. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2/versions/run.ver
+. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.6/versions/run.ver
 
-RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.7.2
+RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.6.6
 WORKDIR=/lfs/h1/nos/ptmp/$LOGNAME/work/${nosofs_ver}/ngofs2
 if [ ! -r $WORKDIR ]; then
   mkdir -p -m 755 $WORKDIR
@@ -42,7 +42,7 @@ module load gsl/${gsl_ver}
 module load udunits/${udunits_ver}
 module load nco/${nco_ver}
 module load cdo/${cdo_ver}
-module load awscli/1.16.308
+module load awscli/${awscli_ver}
 
 # EXPORT list here
 

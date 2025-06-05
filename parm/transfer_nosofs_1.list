@@ -23,94 +23,32 @@
 # directory are included, so if no exclude patterns match that file, it will be
 # transferred.
 
-_COMROOT_/nosofs/_SHORTVER_/cbofs._PDY_/
-B 28000
 # This directory is a good candidate for compression
 #Z
 
 _COMROOT_/nosofs/_SHORTVER_/dbofs._PDY_/
 
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/ngofs2._PDY_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs._PDY_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs_free._PDY_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs_da._PDY_/
-
-
 _COMROOT_/nosofs/_SHORTVER_/tbofs._PDY_/
 
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/creofs._PDY_/
-
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/sfbofs._PDY_/
-
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/leofs._PDY_/
-B 3500
-# This directory is a good candidate for compression
-#Z
+_COMROOT_/nosofs/_SHORTVER_/cbofs._PDY_/
+B 28000
 
 _COMROOT_/nosofs/_SHORTVER_/gomofs._PDY_/
 
+_COMROOT_/nosofs/_SHORTVER_/ciofs._PDY_/
+
+
+# This directory is a good candidate for compression
+#Z
 
 _COMROOT_/nosofs/_SHORTVER_/dbofs._PDYm1_/
 
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/ngofs2._PDYm1_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs._PDYm1_/
-
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs_free._PDYm1_/
-
-
 _COMROOT_/nosofs/_SHORTVER_/tbofs._PDYm1_/
 
-
-_COMROOT_/nosofs/_SHORTVER_/wcofs_da._PDYm1_/
-
-
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/creofs._PDYm1_/
-
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/sfbofs._PDYm1_/
-
-# This directory is a good candidate for compression
-#Z
-
-_COMROOT_/nosofs/_SHORTVER_/leofs._PDYm1_/
-
-# This directory is a good candidate for compression
-#Z
-
 _COMROOT_/nosofs/_SHORTVER_/cbofs._PDYm1_/
-
-# This directory is a good candidate for compression
-#Z
+B 28000
 
 _COMROOT_/nosofs/_SHORTVER_/gomofs._PDYm1_/
 
+_COMROOT_/nosofs/_SHORTVER_/ciofs._PDYm1_/
 

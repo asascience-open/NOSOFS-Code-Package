@@ -19,7 +19,7 @@ domain1=""
 domain="conus"
 if [ ${OFS} == "ciofs" ]; then
   domain1="_alaska"
-  domain="alaska"
+  domain=${domain1:1}    ##"alaska"
 fi
 
 #  Search analysis NWM file
@@ -95,6 +95,10 @@ while [ ! -f ${nwmfile} ]; do
   HHNWM=${thedate:8:2}
   nwm_dir=${COMINnwm}/nwm.${YYNWM}${MMNWM}${DDNWM}/short_range${domain1}
   nwmfile=${nwm_dir}/nwm.t${HHNWM}z.short_range.channel_rt.f001.${domain}.nc
+
+  if [ ${i} -gt 240 ]; then
+    break
+  fi
 done
 
 for j in $(seq -f "%03g" 1 45); do
@@ -165,6 +169,5 @@ echo ${NWMfile} >> nwm_input.ctl
 cat tmp_river.ctl >> nwm_input.ctl
 \rm tmp_river.ctl
 
-#cp -p ${FIXofs}/${PREFIXNOS}*.river.index .
 cp -p ${FIXofs}/${PREFIXNOS}*.river.index .
 

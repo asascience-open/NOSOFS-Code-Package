@@ -2,15 +2,15 @@
 #PBS  -N ciofs_prep_00
 #PBS  -A NOSOFS-DEV
 #PBS  -q devmax
-#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/ciofs_prep_00.out
-#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/ciofs_prep_00.err
+#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/ciofs_prep_00.out
+#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/ciofs_prep_00.err
 #PBS  -l place=vscatter,select=1:ncpus=8:mpiprocs=8
 #PBS  -l walltime=1:30:00
 
-. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2/versions/run.ver
+. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.6/versions/run.ver
 
 # cd to your working directory
-RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.7.2
+RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.6.6
 WORKDIR=/lfs/h1/nos/ptmp/$LOGNAME/work/${nosofs_ver}/ciofs
 if [ ! -r $WORKDIR ]; then
   mkdir -p -m 755 $WORKDIR

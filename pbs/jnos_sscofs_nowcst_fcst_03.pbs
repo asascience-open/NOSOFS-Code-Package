@@ -2,15 +2,15 @@
 #PBS  -N sscofs_nf_03
 #PBS  -A NOSOFS-DEV
 #PBS  -q devmax
-#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/sscofs_nf_03.out
-#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.7.2/sscofs_nf_03.err
+#PBS  -o /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/sscofs_nf_03.out
+#PBS  -e /lfs/h1/nos/ptmp/aijun.zhang/rpt/v3.6.6/sscofs_nf_03.err
 #PBS  -l place=vscatter:excl,select=6:ncpus=128:mpiprocs=100
 #PBS  -l walltime=02:30:00
 
-. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2/versions/run.ver
+. /lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.6.6/versions/run.ver
 
 # cd to your working directory
-RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.7.2
+RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/v3.6.6
 #WORKDIR=/lfs/h1/nos/ptmp/$LOGNAME/sscofs/work
 WORKDIR=/lfs/h1/nos/ptmp/$LOGNAME/work/${nosofs_ver}/sscofs
 if [ ! -r $WORKDIR ]; then

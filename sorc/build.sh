@@ -1,8 +1,21 @@
 #!/bin/sh
-#HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.5.0
-#HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/code_delivered2NCO/nosofs.v3.5.0_4NCO
+set -x 
+#############################################################################
+#                                                                             #
+# Compiles source codes of nosofs, moves executables to exec and cleans up    #
+#Usage:                                                                       #
+# ./build.sh     - build executable with normal options                       #
+# ./build.sh debug  - build executable with debug options                     #
+#                                                                 June 2024   #
+#                                                                             #
+###############################################################################
+#
+# --------------------------------------------------------------------------- #
+#HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2
 cd ..
 HOMEnos=`pwd`
+
+# 1. Preparations - load required modules, set compilers, and set pathnames
 
 BUILD_VERSION_FILE=$HOMEnos/versions/build.ver
 if [ -f $BUILD_VERSION_FILE ]; then
@@ -21,6 +34,9 @@ export COMP_ICC=cc
 export COMP_CC=cc
 export COMP_CPP=cpp
 export COMP_MPCC=cc
+export SORCnos=$HOMEnos/sorc
+export EXECnos=$HOMEnos/exec
+export LIBnos=$HOMEnos/lib
 
 module purge
 printenv SHELL
@@ -50,16 +66,6 @@ module load hdf5/${hdf5_ver}
 module load subversion/${subversion_ver}
 
 
-#module purge
-#printenv SHELL
-#module use $HOMEnos/modulefiles
-#module load nosofs
-#module list 2>&1
-
-export SORCnos=$HOMEnos/sorc
-export EXECnos=$HOMEnos/exec
-export LIBnos=$HOMEnos/lib
-
 if [ ! -s $EXECnos ]
 then
   mkdir -p $EXECnos
@@ -71,123 +77,55 @@ then
   mkdir -p $LIBnos
 fi
 
-cd $SORCnos/nos_ofs_utility.fd
-rm -f *.o *.a
-gmake -f makefile
-
-if [ -s $SORCnos/nos_ofs_utility.fd/libnosutil.a ]
-then
-  chmod 755 $SORCnos/nos_ofs_utility.fd/libnosutil.a
-  mv $SORCnos/nos_ofs_utility.fd/libnosutil.a ${LIBnos}
+# 2. Create all executions of nosofs framework (COMF) 
+cd $SORCnos
+fcodes=`ls -d nos*.fd | sed 's/\.fd//g'`
+echo " FORTRAN codes found: "${fcodes}.f
+if [ $# -eq 0 ]; then
+#  nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
+   cd $SORCnos/nos_ofs_utility.fd
+   make clean
+   make
+   make install
+   make clean
+   for code in $fcodes ; do
+    if [ $code != "nos_ofs_utility" ]; then	   
+      echo "Creating $code "
+      cd $SORCnos/${code}.fd
+      make clean
+      make 
+      make install
+      make clean
+    fi  
+   done   
 fi
-gmake clean
+# 3. Create all executions with debug for nosofs framework (COMF)
+if [ "$1" = "debug" ]; then
+#  nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes
+   cd $SORCnos/nos_ofs_utility.fd
+   make clean
+   make DEBUG=full
+   make install
+   make clean
+   for code in $fcodes ; do
+     if [ $code != "nos_ofs_utility" ]; then
+       echo "Creating $code "
+       cd $SORCnos/${code}.fd
+       make clean
+       make DEBUG=full
+       make install
+       make clean
+     fi
+   done
+fi
 
-
-#cd $SORCnos/nos_ofs_combine_field_netcdf_selfe.fd
-#rm -f *.o *.a
-#gmake -f makefile
-
-#cd $SORCnos/nos_ofs_combine_station_netcdf_selfe.fd
-#rm -f *.o *.a
-#gmake -f makefile
-
-#cd $SORCnos/nos_ofs_combine_hotstart_out_selfe.fd
-#rm -f *.o *.a
-#gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_met.fd
-rm -f *.o *.a
-gmake -f makefile
-cd $SORCnos/nos_ofs_create_forcing_met_fvcom.fd
-rm -f *.o *.a
-gmake -f makefile
-cd $SORCnos/nos_ofs_create_forcing_obc_tides.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_obc.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_obc_fvcom.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_obc_fvcom_gl.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_obc_fvcom_nest.fd
-rm -f *.o *.a
-gmake -f makefile
-
-#cd $SORCnos/nos_ofs_create_forcing_obc_selfe.fd
-#rm -f *.o *.a
-#gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_river.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_met_file_search.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_read_restart.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_read_restart_fvcom.fd
-rm -f *.o *.a
-gmake -f makefile
-
-#cd $SORCnos/nos_ofs_read_restart_selfe.fd
-#rm -f *.o *.a
-#gmake -f makefile
-
-cd $SORCnos/nos_ofs_reformat_ROMS_CTL.fd
-rm -f *.o *.a
-gmake -f makefile
-
-cd $SORCnos/nos_creofs_wl_offset_correction.fd
-gmake clean
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_create_forcing_nudg.fd
-gmake clean
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_residual_water_calculation.fd
-gmake clean
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_adjust_tides.fd
-gmake clean
-gmake -f makefile
-
-cd $SORCnos/nos_ofs_rename.fd
-rm -f *.o *.a
-gmake -f makefile
-
-#exit
-
-#  Compile ocean model of SELFE.fd for CREOFS
-#cd $SORCnos/SELFE.fd
-#gmake clean
-#gmake -f makefile
-#if [ -s  selfe_creofs ]; then
-#  mv selfe_creofs $EXECnos/.
-#else
-#  echo 'selfe executable is not created'
-#fi
-#gmake clean
-
-
-#  Compile ocean model of ROMS-based OFS 
+# 4. Compile ocean models of ROMS-based OFS 
+# cbofs, dbofs, tbofs,ciofs, gomofs, wcofs, wcofs_da, wcofs_free
 cd $SORCnos/ROMS.fd
 ./COMPILE_ROMS.sh
 
-#  Compile ocean model of FVCOM-based OFS
+# 5. Compile ocean models of FVCOM-based OFS
+# leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs
 cd $SORCnos/FVCOM.fd
 ./COMPILE_FVCOM.sh
 

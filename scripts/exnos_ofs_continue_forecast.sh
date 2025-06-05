@@ -77,36 +77,36 @@ else
     if [ -s ${OFS}_station_timeseries.nc ]; then
       mv ${OFS}_station_timeseries.nc ${OFS}_station_timeseries.nc.old
     fi
-    NFILE=`ls -al *${OFS}_restart*.nc | wc -l`
+    NFILE=`find . -name "*${OFS}_restart*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       latest_restart_f=`ls -trl *${OFS}_restart*.nc | tail -1 | awk '{print $NF}' `
     fi
 # Rename output files before continuing forecast to avoid overwriting
-    NFILE=`ls -al *${OFS}_surface_????.nc | wc -l`
+    NFILE=`find -name "*${OFS}_surface_????.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
        $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $runtype 2d "$time_nowcastend" "$time_nowcastend"
     fi
-    NFILE=`ls -al *${OFS}_????.nc | wc -l`
+    NFILE=`find . -name "*${OFS}_????.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
        $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $runtype 3d "$time_nowcastend " "$time_nowcastend"
     fi
   elif [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
-     NFILE=`ls -al *.rst.forecast*.nc | wc -l`
+     NFILE=`find . -name "*.rst.forecast*.nc" | wc -l`
      if [ $NFILE -gt 0 ]; then
        latest_restart_f=`ls -trl  *.rst.forecast*.nc | tail -1 | awk '{print $NF}' `
      fi
 # Rename output files before continuing forecast to avoid overwritten
-     NFILE=`ls -al *.stations.forecast*.nc | wc -l`
+     NFILE=`find . -name "*.stations.forecast*.nc" | wc -l`
      if [ $NFILE -gt 0 ]; then
        latest_station_f=`ls -trl  *.stations.forecast*.nc | tail -1 | awk '{print $NF}' `
        mv  $latest_station_f ${latest_station_f}.old
      fi     
 
-     NFILE=`ls -al *.fields.forecast*.nc | wc -l`
+     NFILE=`find . -name "*.fields.forecast*.nc" | wc -l`
      if [ $NFILE -gt 0 ]; then
        $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $runtype 3d "$time_nowcastend" "$time_nowcastend"
      fi
-     NFILE=`ls -al *.surface.forecast*.nc | wc -l`
+     NFILE=`find . -name  "*.surface.forecast*.nc" | wc -l`
      if [ $NFILE -gt 0 ]; then
        $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $runtype 2d "$time_nowcastend" "$time_nowcastend"
      fi
@@ -256,12 +256,12 @@ then
       err_chk
     fi  
   elif [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
-    NFILE=`ls -al *.stations.forecast*.nc | wc -l`
+    NFILE=`find . -name "*.stations.forecast*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       latest_station_new=`ls -trl  *.stations.forecast*.nc | tail -1 | awk '{print $NF}' `
       mv ${latest_station_new} ${latest_station_new}.new
     fi 
-    NFILE=`ls -al *.stations.forecast*.nc.old | wc -l`
+    NFILE=`find . -name "*.stations.forecast*.nc.old" | wc -l`
     if [ $NFILE -gt 0 ]; then
       latest_station_f=`ls -trl  *.stations.forecast*.nc.old | tail -1 | awk '{print $NF}' `
     fi 
@@ -285,7 +285,7 @@ else
       mv ${OFS}_station_timeseries.nc.old  $STA_OUT_FORECAST
     fi
   elif [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
-    NFILE=`ls -al *.stations.forecast*.nc.old | wc -l`
+    NFILE=`find . -name "*.stations.forecast*.nc.old" | wc -l`
     if [ $NFILE -gt 0 ]; then
       latest_station_f=`ls -trl  *.stations.forecast*.nc.old | tail -1 | awk '{print $NF}' `
       mv  $latest_station_f $STA_OUT_FORECAST

@@ -116,7 +116,7 @@ dashL= $(empty) -L
 #            FLAG_41 = -DPETSC_B
 #            include ${PETSC_DIR}/bmake/common/variables
 #
-#       FOR VERSION 3.20.4
+#       FOR VERSION 3.18.5
 #            FLAG_41 = -DPETSC_C
 #            include ${PETSC_DIR}/lib/petsc/conf/variables
 
@@ -169,15 +169,15 @@ dashL= $(empty) -L
 
              FLAG_4 = -DMULTIPROCESSOR
 #         If using METIS 5 or above, uncomment FLAG_411 and read the file readme_metis in folder METIS_readme for detail
-	     FLAG_411 = -DMETIS_5
+#	     FLAG_411 = -DMETIS_5
 #        If FLAG_411 is defined, uncomment path below	     
-             PARLIB = 
-             PARTINCS = -I/usr/local/install/metis/5.1.0/intel/19/include
-             PARTLIBS = -L/usr/local/install/metis/5.1.0/intel/19/lib -lmetis
+#             PARLIB = 
+#             PARTINCS = -I/usr/local/install/metis/5.1.0/intel/19/include
+#             PARTLIBS = -L/usr/local/install/metis/5.1.0/intel/19/lib -lmetis
 #        If FLAG_411 is not defined, uncomment path below
-#             PARLIB = -lmetis  #-L/usr/local/lib -lmetis
-#             PARTINCS =
-#             PARTLIBS =
+             PARLIB = -lmetis  #-L/usr/local/lib -lmetis
+             PARTINCS =
+             PARTLIBS =
 
 #--------------------------------------------------------------------------
 #        WATER_QUALITY      INCLUDE EPA WATER QUALITY MOD
@@ -220,7 +220,7 @@ dashL= $(empty) -L
 #                           UNCOMMENT TO INCLUDE DATA ASSIMILATION 
 #--------------------------------------------------------------------------
 
-             FLAG_7 = -DDATA_ASSIM
+###             FLAG_7 = -DDATA_ASSIM
 #             OILIB  = -lmkl_lapack -lmkl_em64t -lguide -lpthread
 
 #             OILIB  = -L/usr/local/share/Intel-Compilers/mkl/lib/em64t -lmkl_lapack -lmkl_em64t -lguide -lpthread
@@ -240,9 +240,9 @@ dashL= $(empty) -L
 #   !!!!!! ONLY ONE OF THE FLAGS BELOW CAN BE AND MUST BE CHOSEN
 #--------------------------------------------------------------------------
 
-            FLAG_8 =  -DLIMITED_NO
+##            FLAG_8 =  -DLIMITED_NO
 #            FLAG_8 =  -DLIMITED_1
-#            FLAG_8 =  -DLIMITED_2
+            FLAG_8 =  -DLIMITED_2
 
 #--------------------------------------------------------------------------
 #  Semi-Implicit time stepping method
@@ -296,7 +296,7 @@ dashL= $(empty) -L
 #       RIVER INPUT FILES!
 #--------------------------------------------------------------------------
 
-            FLAG_14 = -DRIVER_FLOAT
+###            FLAG_14 = -DRIVER_FLOAT
 
 #--------------------------------------------------------------------------
 #        The TVD (total variational diminishing) option for FVCOM was developed by 
@@ -426,7 +426,7 @@ dashL= $(empty) -L
 #         AIR_PRESSURE FROM SURFACE FORCING                           
 #--------------------------------------------------------------------------
 
-            FLAG_28 = -DAIR_PRESSURE  
+###            FLAG_28 = -DAIR_PRESSURE  
 
 #--------------------------------------------------------------------------
 # Visit online simulation mode

@@ -60,7 +60,7 @@ C A new subroutine from Jianhua Qi is used
       character*120 START_TIME, END_TIME,CTIME*26
       CHARACTER globalstr(9)*120
       real*8 jday_start,jbase_date,JULIAN,yearb,monthb,dayb,hourb
-      real*8 jday,jday0,jdays,jdaye
+      real*8 jday,jday0,jdays,jdaye,day_hotrestart,day_start,ocean_time
       real, allocatable :: zeta  (:,:)
       real, allocatable :: ubar  (:,:)
       real, allocatable :: vbar  (:,:)
@@ -94,6 +94,8 @@ C A new subroutine from Jianhua Qi is used
       real, allocatable :: tmp3d  (:,:,:)
       real, allocatable :: tmp4d  (:,:,:,:)
       real, allocatable :: tmp5d  (:,:,:,:,:)
+      real*8, allocatable :: dtmp1d  (:)
+
       integer dimids(5),COUNT(5),DIMS(5),STATUS
       LOGICAL FEXIST,CHANGE_TIME
       CHARACTER (LEN=10) BIG_BEN(3),CURRENT_TIME*20
@@ -157,20 +159,23 @@ C A new subroutine from Jianhua Qi is used
            WRITE(*,*)'There is error to read: ',trim(VNAME)
            ocean_time=-999.99
         ELSE	
-          IF (ALLOCATED(tmp4d)) DEALLOCATE(tmp4d)
-          ALLOCATE(tmp4d(DIMS(1),DIMS(2),DIMS(3),DIMS(4)) )
-          CALL READ_NETCDF(FIN,VNAME,ANAME,NDIM,DIMS,TMP4D,ATT,1,STATUS)
+          IF (ALLOCATED(dtmp1d)) DEALLOCATE(dtmp1d)
+          ALLOCATE(dtmp1d(DIMS(1)) )
+          STATUS = NF_OPEN(trim(FIN),NF_NOWRITE, NCID)
+          IF(STATUS .NE. NF_NOERR)then
+            print *,'error message=',status
+            stop 'open netCDF file failed'
+          ENDIF
+          STATUS = NF_INQ_VARID(NCID,TRIM(VNAME),IDVAR)
+          STATUS = NF_INQ_VARNDIMS(NCID,IDVAR,ndims)
+          status = NF_INQ_VARDIMID(NCID,IDVAR,dimids)
+          STATUS = NF_GET_VAR_DOUBLE(NCID,IDVAR,DTMP1D)
+          STATUS=NF_CLOSE(NCID)
           ocean_time=-999.99
           DO I1=1,DIMS(1)
-          DO I2=1,DIMS(2)
-          DO I3=1,DIMS(3)
-          DO I4=1,DIMS(4)
-           if(tmp4d(I1,I2,I3,I4) .GT. ocean_time)then
-	     ocean_time=tmp4d(I1,I2,I3,I4)
-	   endif   
-          ENDDO
-          ENDDO
-          ENDDO
+            if(dtmp1d(I1) .GT. ocean_time)then
+	     ocean_time=dtmp1d(I1)
+	    endif   
           ENDDO
 !      if(ocean_time .GT. 0.0)ocean_time=ocean_time/86400.0
           ANAME='units'
@@ -315,12 +320,13 @@ C A new subroutine from Jianhua Qi is used
             STATUS = NF_INQ_DIMLEN(NCID,dimids(i),DIMS(i))
             write(*,*) TRIM(VNAME),' dim ',i,' = ',DIMS(i)
          enddo
-         IF (ALLOCATED(tmp1d)) DEALLOCATE(tmp1d)
-         ALLOCATE(TMP1D(DIMS(1)) )
-	 STATUS = NF_GET_VAR_REAL(NCID,IDVAR,TMP1D)
+         IF (ALLOCATED(dtmp1d)) DEALLOCATE(dtmp1d)
+         ALLOCATE(dTMP1D(DIMS(1)) )
+!	 STATUS = NF_GET_VAR_REAL(NCID,IDVAR,TMP1D)
+         STATUS = NF_GET_VAR_DOUBLE(NCID,IDVAR,DTMP1D)
 	 IF(DIMS(1) .GT. 1)THEN
 	   DO I=DIMS(1)-1,1,-1
-	     TMP1D(I)=TMP1D(I+1)-TMP1D(I)
+	     DTMP1D(I)=DTMP1D(I+1)-DTMP1D(I)
 	   ENDDO
 	 ENDIF    
          ANAME='units'
@@ -332,7 +338,7 @@ C A new subroutine from Jianhua Qi is used
          LEN1=LEN_TRIM(BUFFER)
          LL=INDEX(BUFFER,'seconds')
          IF(LL .GT. 0)THEN
-	   TMP1D(DIMS(1))=day_hotrestart*86400.0
+	   DTMP1D(DIMS(1))=day_hotrestart*86400.0
 	   WRITE(BUFFER,202)'seconds since ',base_date(1),'-',
      1	   base_date(2),'-',base_date(3),base_date(4),':00:00'
  202       format(a14,I4.4,a1,I2.2,a1,I2.2,1x,I2.2,a6)
@@ -340,7 +346,7 @@ C A new subroutine from Jianhua Qi is used
          ENDIF
          LL=INDEX(BUFFER,'days')
          IF(LL .GT. 0)THEN
-	   TMP1D(DIMS(1))=day_hotrestart
+	   DTMP1D(DIMS(1))=day_hotrestart
 	   WRITE(BUFFER,204)'days since ',base_date(1),'-',
      1	   base_date(2),'-',base_date(3),base_date(4),':00:00'
  204       format(a11,I4.4,a1,I2.2,a1,I2.2,1x,I2.2,a6)
@@ -348,7 +354,7 @@ C A new subroutine from Jianhua Qi is used
         ENDIF
         IF(DIMS(1) .GT. 1)THEN
 	   DO I=DIMS(1)-1,1,-1
-	     TMP1D(I)=TMP1D(I+1)+TMP1D(I)
+	     DTMP1D(I)=DTMP1D(I+1)+DTMP1D(I)
 	   ENDDO
 	ENDIF    
         STATUS = NF_REDEF(NCID)
@@ -366,7 +372,7 @@ C A new subroutine from Jianhua Qi is used
         ENDIF	 
         STATUS = NF_INQ_VARID(NCID,TRIM(VNAME),IDVAR)
  !       if (status .ne. NF_NOERR)return 
-        STATUS = NF_PUT_VAR_REAL(NCID,IDVAR,day_hotrestart)
+        STATUS = NF_PUT_VAR_DOUBLE(NCID,IDVAR,day_hotrestart)
 
         if (status .ne. NF_NOERR) then
              print *,'status=',status

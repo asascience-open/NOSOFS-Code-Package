@@ -121,7 +121,7 @@ CONTINUE_FORECAST=NO
 CONTINUE_FORECAST_FILE=${RUN}_CONTINUE_FORECAST.t${cyc}z
 
 # for FVCOM-based OFS
-NFILE=`ls -al *${OFS}_restart*.nc *.rst.forecast*.nc | wc -l`
+NFILE=`find . -name "*${OFS}_restart*.nc" -o -name "*.rst.forecast*.nc" | wc -l`
 if [ $NFILE -gt 0 ]; then
     latest_restart_f=`ls -al *${OFS}_restart*.nc *.rst.forecast*.nc | tail -1 | awk '{print $NF}' `
 else

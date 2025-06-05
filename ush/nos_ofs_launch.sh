@@ -140,12 +140,14 @@ if [ ${OCEAN_MODEL} != "ROMS" -a ${OCEAN_MODEL} != "roms" ]; then
   fi
 fi
 if [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]; then
+  if [ $OFS = leofs -o $OFS = lmhofs -o $OFS = ngofs2 -o $OFS = sfbofs ]; then
   if [ -d ${FIXofs}/$STA_EDGE_CTL -o ! -s ${FIXofs}/$STA_EDGE_CTL ]; then
     echo "${FIXofs}/$STA_EDGE_CTL is not found"
     echo "please provide file of ${FIXofs}/$STA_EDGE_CTL"
     echo "please provide file of ${FIXofs}/$STA_EDGE_CTL" >> $cormslogfile
   elif [ -s ${FIXofs}/$STA_EDGE_CTL ]; then
     cp -p ${FIXofs}/$STA_EDGE_CTL $DATA/.
+  fi
   fi
 fi
 
@@ -363,7 +365,7 @@ if [ "$runtype" = "prep" ] || [ "$runtype" = "PREP" ]; then
       export err=$?; err_chk
     fi
   fi
-  NFILE=`ls -al  ${FIXofs}/${PREFIXNOS}.obc.clim.ts.* | wc -l`
+  NFILE=`find ${FIXofs} -name "${PREFIXNOS}.obc.clim.ts.*" |wc -l`
   if [ $NFILE -gt 0 ]; then
     cp -p ${FIXofs}/${PREFIXNOS}.obc.clim.ts.* $DATA
   fi

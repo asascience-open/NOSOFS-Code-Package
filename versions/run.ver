@@ -1,12 +1,12 @@
 #OFS version
-export nosofs_ver=v3.6.0
+export nosofs_ver=v3.6.6
 export gfs_ver=v16.3
 export nam_ver=v4.2
 export hrrr_ver=v4.1
 export rap_ver=v5.1
 export rtma_ver=v2.9
 export petss_ver=v1.3
-export rtofs_ver=v2.3
+export rtofs_ver=v2.4
 export nwm_ver=v3.0
 
 # Environment
@@ -47,7 +47,9 @@ export gcc_ver=12.1.0
 export metis_ver=5.1.0
 export petsc_ver=3.20.4
 export awscli_ver=2.7.35
-export maillist=${maillist:-'nco.spa@noaa.gov,nos.co-ops.modelingteam@noaa.gov'}
+#export maillist=${maillist:-'nco.spa@noaa.gov,nos.co-ops.modelingteam@noaa.gov'}
 ######################################
 #
 
+export maillist=${maillist:-'floyd.fayton@noaa.gov'}
+export COMPATH=/lfs/h1/ops/prod/com/nam:/lfs/h1/ops/prod/com/gfs:/lfs/h1/ops/prod/com/rtofs:/lfs/h1/ops/prod/com/hrrr:/lfs/h1/ops/prod/com/etss:/lfs/h1/ops/prod/com/nwm

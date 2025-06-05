@@ -736,7 +736,7 @@ then
         cp -p ${RUN}.status $COMOUT/${RUN}.status_${cyc}
       fi
 # save new nowcast restart file into archive directory for next cycle run
-      NFILE=`ls -al *${OFS}.rst.nowcast*.nc | wc -l`
+      NFILE=`find . -name "*${OFS}.rst.nowcast*.nc" | wc -l`
       if [ $NFILE -gt 0 ]; then
          latest_restart_f=`ls -al *${OFS}.rst.nowcast*.nc | tail -1 | awk '{print $NF}' `
          cp -p $latest_restart_f $COMOUT/$RST_OUT_NOWCAST
@@ -800,11 +800,11 @@ then
       ncks -d ocean_time,2 $initfile ${COMOUT}/${initfile}.new
     fi
 #######################
-    NFILE=`ls -al *${OFS}*.fields.nowcast*.nc | wc -l`
+    NFILE=`find . -name "*${OFS}*.fields.nowcast*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 3d "$time_hotstart" "$time_nowcastend"
     fi
-    NFILE=`ls -al ${PREFIXNOS}*.surface.nowcast*_????.nc | wc -l`
+    NFILE=`find . -name "${PREFIXNOS}*.surface.nowcast*_????.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 2d "$time_hotstart" "$time_nowcastend"
     fi
@@ -846,7 +846,7 @@ then
        echo "${RUN} NOWCAST RUN OF CYCLE t${HH}z ON $PDY COMPLETED SUCCESSFULLY 100" >> $cormslogfile
        echo "NOWCAST_RUN DONE 100"  >> $cormslogfile
 # save new nowcast restart file into archive directory for next cycle run
-       NFILE=`ls -al *${OFS}*_restart*.nc | wc -l`
+       NFILE=`find . -name "*${OFS}*_restart*.nc" | wc -l`
        if [ $NFILE -gt 0 ]; then
          latest_restart_f=`ls -al *${OFS}*_restart*.nc | tail -1 | awk '{print $NF}' `
          cp -p $latest_restart_f $DATA/$RST_OUT_NOWCAST
@@ -863,7 +863,7 @@ then
 #       then
 #          cp -p  $DATA/$RUN'_0001.nc' $DATA/$HIS_OUT_NOWCAST
 #       fi
-       NFILE=`ls -al *${OFS}*_station_timeseries*.nc | wc -l`
+       NFILE=`find . -name "*${OFS}*_station_timeseries*.nc" | wc -l`
        if [ $NFILE -gt 0 ]; then
 	  latest_restart_f=`ls -al *${OFS}*station_timeseries*.nc | tail -1 | awk '{print $NF}' `
           cp -p $latest_restart_f $DATA/$STA_OUT_NOWCAST
@@ -874,11 +874,11 @@ then
 #         mv $DATA/${RUN}*'_station_timeseries.nc' $DATA/$STA_OUT_NOWCAST
 #       fi
 #######################
-       NFILE=`ls -al *${OFS}*_surface_????.nc | wc -l`
+       NFILE=`find . -name "*${OFS}*_surface_????.nc" | wc -l`
        if [ $NFILE -gt 0 ]; then
         $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 2d "$time_hotstart" "$time_nowcastend"
        fi
-       NFILE=`ls -al *${OFS}*_????.nc | wc -l`
+       NFILE=`find . -name "*${OFS}*_????.nc" | wc -l`
        if [ $NFILE -gt 0 ]; then
         $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 3d "$time_hotstart" "$time_nowcastend"
        fi
@@ -1208,7 +1208,7 @@ then
   fi
   echo 'Ocean Model run ends at time: ' `date `
 #save 3D surface nowcast field output file into COMOUT
-  for combinefields in `ls ${DATA}/${PREFIXNOS}*.fields.n*.nc`
+  for combinefields in `find ${DATA} -name "${PREFIXNOS}*.fields.n*.nc" |sort -u `
   do
      cp -p ${combinefields} ${COMOUT}/.
   done
@@ -1220,7 +1220,9 @@ then
     done
   fi
 #save nowcast station output file into COMOUT
-  cp -p $DATA/$STA_OUT_NOWCAST  ${COMOUT}/$STA_OUT_NOWCAST
+  if [ -s $DATA/$STA_OUT_NOWCAST ]; then
+    cp -p $DATA/$STA_OUT_NOWCAST  ${COMOUT}/$STA_OUT_NOWCAST
+  fi
   if [ -s $DATA/${PREFIXNOS}.t${cyc}z.${PDY}.avg.nowcast.nc ]; then
     cp -p $DATA/${PREFIXNOS}.t${cyc}z.${PDY}.avg.n*.nc $COMOUT/
   fi 
@@ -1630,14 +1632,14 @@ then
 #       (( I = I + 1 ))
 #    done
     if [ -f ${PREFIXNOS}*.avg.nc ]; then
-      mv ${PREFIXNOS}*.avg.nc ${PREFIXNOS}t${cyc}z.${PDY}..avg.forecast.nc
+      mv ${PREFIXNOS}*.avg.nc ${PREFIXNOS}.t${cyc}z.${PDY}.avg.forecast.nc
     fi
 #######################
-    NFILE=`ls -al ${PREFIXNOS}*.fields.forecast*.nc | wc -l`
+    NFILE=`find . -name "${PREFIXNOS}*.fields.forecast*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 3d "$time_nowcastend" "$time_nowcastend"
     fi
-    NFILE=`ls -al ${PREFIXNOS}*.surface.forecast*.nc | wc -l`
+    NFILE=`find . -name "${PREFIXNOS}*.surface.forecast*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 2d "$time_nowcastend" "$time_nowcastend"
     fi
@@ -1697,11 +1699,11 @@ then
           mv $DATA/${PREFIXNOS}*'_station_timeseries.nc' $DATA/$STA_OUT_FORECAST
           echo "  $STA_OUT_FORECAST  saved "
         fi
-        NFILE=`ls -al ${PREFIXNOS}*_surface_????.nc | wc -l`
+        NFILE=`find . -name "${PREFIXNOS}*_surface_????.nc" | wc -l`
         if [ $NFILE -gt 0 ]; then
           $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 2d "$time_nowcastend" "$time_nowcastend"
         fi
-        NFILE=`ls -al ${PREFIXNOS}_????.nc | wc -l`
+        NFILE=`find . -name "${PREFIXNOS}_????.nc" | wc -l`
         if [ $NFILE -gt 0 ]; then
           $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 3d "$time_nowcastend " "$time_nowcastend"
         fi

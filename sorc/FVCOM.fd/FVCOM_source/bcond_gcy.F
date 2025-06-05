@@ -175,20 +175,20 @@
          RHOINTCUR=RHOINTNXT
          RHOINTNXT=0.0_SP
 !---> Lu Wang, LSF@20230420 
-! Find the layer where water depth is lower than 300 m
+! Find the layer where water depth is lower than 200 m !(300 m)
 !         DO K=1,KBM1
 !            RHOINTNXT=RHOINTNXT+(1.0_SP+RHO1(CDX,K))*1.0E3_SP*DZ(CDX,K)
 !         END DO
          K300_CD = KBM1
          K300_ND = KBM1
          DO K=1,KBM1
-            IF (H(CDX)*(-ZZ(CDX,K)) > 300.0_SP) THEN
+            IF (H(CDX)*(-ZZ(CDX,K)) > 200.0_SP) THEN     !qxu 300.0_SP
                 K300_CD = K - 1
                 EXIT
             ENDIF
          ENDDO
          DO K=1,KBM1
-            IF (H(NDX)*(-ZZ(NDX,K)) > 300.0_SP) THEN
+            IF (H(NDX)*(-ZZ(NDX,K)) > 200.0_SP) THEN     !qxu 300.0_SP
                 K300_ND = K - 1
                 EXIT
             ENDIF

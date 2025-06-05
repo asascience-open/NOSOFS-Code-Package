@@ -224,7 +224,7 @@ do
           do
             CYCLE=`echo $N | awk '{printf("%02i",$1)}'`
             TMPFILE9=${COMINrap}/rap.${TMPDATE}/rap.t${CYCLE}z.awp130pgrbf00.grib2
-            if [ -s $TMPFILE9 ]; then
+            if [ -s $TMPFILE9.idx ]; then
               echo $TMPFILE9 >> tmp.out
               EXIST_CYCLE=$CYCLE
               EXIST_DATE=$TMPDATE
@@ -240,14 +240,14 @@ do
             if [ "${OFS,,}" == "ciofs" ]; then
               TMPFILE9=${COMINhrrr}/hrrr.${TMPDATE}/alaska/hrrr.t${CYCLE}z.wrfsfcf01.ak.grib2
             fi
-            if [ -s $TMPFILE9 ]; then
+            if [ -s $TMPFILE9.idx ]; then
               echo $TMPFILE9 >> tmp.out
               if [ $RUNTYPE == "nowcast" ] || [ $RUNTYPE == "NOWCAST" ]; then	 	      
                 EXIST_CYCLE=$CYCLE
                 EXIST_DATE=$TMPDATE		  
 	      elif [ $RUNTYPE == "forecast" ] || [ $RUNTYPE == "FORECAST" ]; then
                 TMPFILE10=${COMINhrrr}/hrrr.${TMPDATE}/conus/hrrr.t${CYCLE}z.wrfsfcf48.grib2
-                if [ -s $TMPFILE10 ]; then
+                if [ -s $TMPFILE10.idx ]; then
                   EXIST_CYCLE=$CYCLE
                   EXIST_DATE=$TMPDATE
 	        fi 
@@ -270,7 +270,7 @@ do
          do
            FF=`echo $N | awk '{printf("%02i",$1)}'`
            TMPFILE9=${COMINrap}/rap.${EXIST_DATE}/rap.t${EXIST_CYCLE}z.awp130bgrbf${FF}.grib2
-           if [ -s $TMPFILE9 ]; then
+           if [ -s $TMPFILE9.idx ]; then
              echo $TMPFILE9 >> tmp.out
            fi
            (( N = N + 1 ))
@@ -286,7 +286,7 @@ do
            if [ "${OFS,,}" == "ciofs" ]; then
               TMPFILE9=${COMINhrrr}/hrrr.${EXIST_DATE}/alaska/hrrr.t${EXIST_CYCLE}z.wrfsfcf${FF}.ak.grib2
            fi
-           if [ -s $TMPFILE9 ]; then
+           if [ -s $TMPFILE9.idx ]; then
              echo $TMPFILE9 >> tmp.out
            fi
            (( N = N + 1 ))
@@ -297,7 +297,7 @@ do
 	 do
 	   FF=`echo $N | awk '{printf("%02i",$1)}'`
            TMPFILE9=${COMINhrrr}/hrrr.${EXIST_DATE}/conus/hrrr.t${EXIST_CYCLE}z.wrfsfcf${FF}.grib2
-           if [ -s $TMPFILE9 ]; then
+           if [ -s $TMPFILE9.idx ]; then
              echo $TMPFILE9 >> tmp.out
            fi
            (( N = N + 1 ))
@@ -309,20 +309,32 @@ do
       do
         if [ $DBASE == "NAM" ]; then
           if [ $OFS != "ciofs" ]; then
-           ls -l ${COMINnam}/nam.${TMPDATE}/nam.t*.awip12*tm00.grib2 | awk '{print $NF}' >> tmp.out
+           if [ -d ${COMINnam}/nam.${TMPDATE} ]; then
+             find ${COMINnam}/nam.${TMPDATE} -name "nam.t*.awip12*tm00.grib2.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+           fi
           elif [ $OFS == "ciofs" ]; then
-           ls -l ${COMINnam}/nam.${TMPDATE}/nam.t*.awp242*tm00.grib2 | awk '{print $NF}' >> tmp.out
+           if [ -d ${COMINnam}/nam.${TMPDATE} ]; then
+             find ${COMINnam}/nam.${TMPDATE} -name "nam.t*.awp242*tm00.grib2.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+           fi
           fi
         elif [ $DBASE == "NAM4" ]; then
           if [ $OFS != "ciofs" ]; then
-           ls -l ${COMINnam}/nam.${TMPDATE}/nam.t*.conusnest.hiresf*tm00.grib2 | awk '{print $NF}' >> tmp.out
+           if [ -d ${COMINnam}/nam.${TMPDATE} ]; then
+             find ${COMINnam}/nam.${TMPDATE} -name "nam.t*.conusnest.hiresf*tm00.grib2.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+           fi
           elif [ $OFS == "ciofs" ]; then
-           ls -l ${COMINnam}/nam.${TMPDATE}/nam.t*.alaskanest.hiresf*tm00.grib2 | awk '{print $NF}' >> tmp.out
+           if [ -d ${COMINnam}/nam.${TMPDATE} ]; then
+             find  ${COMINnam}/nam.${TMPDATE} -name "nam.t*.alaskanest.hiresf*tm00.grib2.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+           fi
           fi
         elif [ $DBASE == "GFS" ];  then
-          ls -l ${COMINgfs}/gfs.${TMPDATE}/*/atmos/gfs.t*.pgrb2.0p50.f??? | awk '{print $NF}' >> tmp.out
+          if [ -d ${COMINgfs}/gfs.${TMPDATE} ]; then
+            find  ${COMINgfs}/gfs.${TMPDATE} -name "gfs.t*.pgrb2.0p50.f???.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+          fi
         elif [ $DBASE == "GFS25" ]; then
-          ls -l ${COMINgfs}/gfs.${TMPDATE}/*/atmos/gfs.t*.pgrb2.0p25.f??? | awk '{print $NF}' >> tmp.out
+          if [ -d ${COMINgfs}/gfs.${TMPDATE} ]; then
+            find  ${COMINgfs}/gfs.${TMPDATE} -name "gfs.t*.pgrb2.0p25.f???.idx" |awk -F".idx" '{print $1}' |sort -u >> tmp.out
+          fi
         fi
         CURRENTTIME=`$NDATE +24 $CURRENTTIME `
         YYYY=`echo $CURRENTTIME | cut -c1-4 `
