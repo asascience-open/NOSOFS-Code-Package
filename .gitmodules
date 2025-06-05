@@ -1,0 +1,4 @@
+[submodule "sorc/FVCOM.fd"]
+	path = sorc/FVCOM.fd
+	url = https://github.com/asascience/FVCOM.git
+        branch = from_coops_v4.4.7
