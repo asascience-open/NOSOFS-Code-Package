@@ -7,5 +7,7 @@ exec/
 fix/*
 !fix/get_fixfiles_s3.sh
 sorc/ROMS.fd/Build_romsM
+# sorc/FVCOM.fd
+sorc/saved.FVCOM.fd
 sorc/FVCOM.fd
 **/__pycache__/
