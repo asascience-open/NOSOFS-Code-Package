@@ -64,7 +64,7 @@ $(CMD):		$(OBJS)
 install:
 	cp -p $(CMD) $(EXECnos)/nos_ofs_create_forcing_nudg
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(CMD)
 
 clobber:	clean
 	rm -f $(CMD) $(CMD).prof

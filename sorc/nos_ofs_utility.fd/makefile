@@ -57,6 +57,7 @@ $(LIB): $(OBJS)
 
 clean:
 	rm -f $(OBJS)
+	rm -f *.o ; rm -f *.a
 
 install:
 	cp -p $(LIB) $(LIBnos)

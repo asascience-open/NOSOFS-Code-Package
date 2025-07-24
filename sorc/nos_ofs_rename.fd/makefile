@@ -63,7 +63,7 @@ install:
 #$(FC) $(LDFLAGS)  -o $(@) $(OBJS) $(PROFLIB) $(LIBS)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(CMD)
 
 clobber:	clean
 	rm -f $(CMD) $(CMD).prof
