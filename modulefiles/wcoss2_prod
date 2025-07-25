@@ -1,0 +1,49 @@
+#%Module
+
+##############################################################
+### 
+##############################################################
+proc ModulesHelp { } {
+puts stderr "Set environment veriables for NOSOFS WCOSS-2 PROD"
+}
+
+
+module-whatis "This module sets the environment variables for \
+               nosofs_shared production utilities:"
+
+setenv COMP_F ftn
+setenv COMP_F_MPI90 ftn
+setenv COMP_F_MPI ftn
+setenv COMP_ICC cc
+setenv COMP_CC cc
+setenv COMP_CPP cpp
+setenv COMP_MPCC cc
+
+# TODO: if envvars isn't working within a module, try loading it as a prerequisite in this modulefile
+module load envvar/$envvars_ver
+
+# Loading Intel Compiler Suite
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load intel/${intel_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load cray-pals/${cray_pals_ver}
+
+#Set other library variables
+#module load netcdf/${netcdf_ver}
+#module load hdf5/${hdf5_ver}
+module load bacio/${bacio_ver}
+module load w3nco/${w3nco_ver}
+module load w3emc/${w3emc_ver}
+module load g2/${g2_ver}
+module load zlib/${zlib_ver}
+module load libpng/${libpng_ver}
+module load bufr/${bufr_ver}
+module load jasper/${jasper_ver}
+
+#Set other library variables
+module load netcdf/${netcdf_ver}
+module load hdf5/${hdf5_ver}
+module load subversion/${subversion_ver}
+
+

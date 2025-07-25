@@ -12,8 +12,8 @@ set -x
 #
 # --------------------------------------------------------------------------- #
 #HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2
-cd ..
-HOMEnos=`pwd`
+
+export HOMEnos=$(dirname $PWD)
 
 # 1. Preparations - load required modules, set compilers, and set pathnames
 
@@ -27,50 +27,23 @@ fi
 
 export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
 
-export COMP_F=ftn
-export COMP_F_MPI90=ftn
-export COMP_F_MPI=ftn
-export COMP_ICC=cc
-export COMP_CC=cc
-export COMP_CPP=cpp
-export COMP_MPCC=cc
 export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
 
 module purge
 printenv SHELL
-module purge
-module load envvar/$envvars_ver
-# Loading Intel Compiler Suite
-module load PrgEnv-intel/${PrgEnv_intel_ver}
-module load craype/${craype_ver}
-module load intel/${intel_ver}
-module load cray-mpich/${cray_mpich_ver}
-module load cray-pals/${cray_pals_ver}
-#Set other library variables
-#module load netcdf/${netcdf_ver}
-#module load hdf5/${hdf5_ver}
-module load bacio/${bacio_ver}
-module load w3nco/${w3nco_ver}
-module load w3emc/${w3emc_ver}
-module load g2/${g2_ver}
-module load zlib/${zlib_ver}
-module load libpng/${libpng_ver}
-module load bufr/${bufr_ver}
-module load jasper/${jasper_ver}
-#
-#Set other library variables
-module load netcdf/${netcdf_ver}
-module load hdf5/${hdf5_ver}
-module load subversion/${subversion_ver}
 
+set +x
+module use -a $HOMEnos/modulefiles
+#module load wcoss2_prod
+module load ioos-sb.intel_x86_64
+set -x
 
 if [ ! -s $EXECnos ]
 then
   mkdir -p $EXECnos
 fi
-export LIBnos=$HOMEnos/lib
 
 if [ ! -s $LIBnos ]
 then
@@ -80,25 +53,47 @@ fi
 # 2. Create all executions of nosofs framework (COMF) 
 cd $SORCnos
 fcodes=`ls -d nos*.fd | sed 's/\.fd//g'`
+echo "fcodes: "
+echo "$fcodes"
+
+echo "debugging not building all of the prep stuff"
+fcodes=""
+
 echo " FORTRAN codes found: "${fcodes}.f
 if [ $# -eq 0 ]; then
-#  nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
-   cd $SORCnos/nos_ofs_utility.fd
-   make clean
-   make
-   make install
-   make clean
-   for code in $fcodes ; do
+  # nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
+  cd $SORCnos/nos_ofs_utility.fd
+  make clean
+  make
+  result=$?
+  if [ $result -ne 0 ]; then
+    echo "ERROR building nos_ofs_utility.fd"
+    exit $result
+  else
+    echo "SUCCESS: nos_ofs_utility.fd built"
+  fi
+  make install
+  make clean
+
+  for code in $fcodes ; do
     if [ $code != "nos_ofs_utility" ]; then	   
       echo "Creating $code "
       cd $SORCnos/${code}.fd
       make clean
       make 
+      result=$?
+      if [ $result -ne 0 ]; then
+        echo "ERROR building ${code}.fd"
+        exit $result
+      else
+        echo "SUCCESS: ${code}.fd built"
+      fi
       make install
       make clean
     fi  
-   done   
+  done   
 fi
+
 # 3. Create all executions with debug for nosofs framework (COMF)
 if [ "$1" = "debug" ]; then
 #  nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes
@@ -122,7 +117,7 @@ fi
 # 4. Compile ocean models of ROMS-based OFS 
 # cbofs, dbofs, tbofs,ciofs, gomofs, wcofs, wcofs_da, wcofs_free
 cd $SORCnos/ROMS.fd
-./COMPILE_ROMS.sh
+# ./COMPILE_ROMS.sh
 
 # 5. Compile ocean models of FVCOM-based OFS
 # leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs
