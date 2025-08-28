@@ -45,10 +45,6 @@ export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
 
-#cd $SORCnos/ROMS.fd
-#gmake clean
-#./build_tbofs.sh
-
 
 #  Compile ocean model of ROMS for CBOFS
 cd $SORCnos/ROMS.fd
@@ -59,6 +55,8 @@ if [ -s  cbofs_roms_mpi ]; then
 else
   echo 'roms executable for DBOFS is not created'
 fi
+
+exit
 
 #  Compile ocean model of ROMS for CBOFS
 cd $SORCnos/ROMS.fd

@@ -22,11 +22,14 @@ setenv COMP_CPP cpp
 # setenv COMP_MPCC "mpicc -fc=icc"
 setenv COMP_MPCC mpicc
 
+# AVX512 not available on hpc6a instances
+setenv NO_AVX512 1
+
 module load intel-oneapi-compilers/2023.1.0-gcc-11.2.1-3rbcwfi 
 module load intel-oneapi-mkl/2023.1.0-oneapi-2023.1.0-ueed5wr
 module load netcdf-fortran/4.6.1-intel-2021.9.0-cpxxwci
 # module load intel-oneapi-mpi/2021.12.1-intel-2021.9.0-6nra3z4
-#
+
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
 # Loding nceplibs modules
@@ -46,10 +49,7 @@ set netcdfc [exec nc-config --prefix]
 regsub {\n$} $netcdfc {} netcdfc
 setenv NETCDFC $netcdfc
 
-# setenv LD_LIBRARY_PATH "$env(NETCDF)/lib:$LD_LIBRARY_PATH
 prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
 prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
-
-# setenv NETCDF_INCDIR  "$env(NETCDF)/include"
 
 setenv JASPER_LIB "-L/lib64 -ljasper"

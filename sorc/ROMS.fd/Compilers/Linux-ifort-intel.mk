@@ -37,13 +37,18 @@
 #
 # First the defaults
 #
-#               FC := ifort
-               FC := mpif90
-# ifdef NO_AVX512
-#           FFLAGS += -march=core-avx2
-#endif
+#              Use mpi wrappers
+#                  mpiifort --help # wrapper
+#                  mpif90 -fc=mpiifort --help
+#                  mpif90 -fc=ifort --help
+#                  mpiifort --version
+#               FC := mpif90
+               FC := mpiifort
            FFLAGS := -fp-model precise
 #           FFLAGS += -heap-arrays
+ifdef NO_AVX512
+           FFLAGS += -march=core-avx2
+endif
        FIXEDFLAGS := -nofree
         FREEFLAGS := -free
               CPP := /usr/bin/cpp
@@ -236,8 +241,8 @@ endif
 
 # Use full path of compiler.
 
-#               FC := $(shell which ${FC})
-               FC := $(shell which ${FC})  -fc=ifort
+               FC := $(shell which ${FC})
+#               FC := $(shell which ${FC})  -fc=ifort
                LD := $(FC)
 
 #--------------------------------------------------------------------------

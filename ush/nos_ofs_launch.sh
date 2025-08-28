@@ -167,7 +167,9 @@ fi
 
 
 export pgm=${FIXofs}/$STA_OUT_CTL"_copy"
-. prep_step
+
+# Skipping prep_step on Sandbox for now
+#PT . prep_step
 
 if [ ! -s ${FIXofs}/$STA_OUT_CTL ]; then
   echo '${FIXofs}/$STA_OUT_CTL is not found'

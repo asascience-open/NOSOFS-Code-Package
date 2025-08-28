@@ -675,6 +675,8 @@ then
     fi
   fi
 
+  ######## NOWCAST #########
+  ##########################
   echo 'Ocean Model run starts at time: ' `date `
 # --------------------------------------------------------------------------- #
 # 2   Execute ocean model of ROMS; where ${RUN}_roms_nowcast.in is created by nos_ofs_reformat_roms_ctl.sh
@@ -682,9 +684,11 @@ then
   then 
 #    mpirun $EXECnos/${RUN}_roms_mpi ${RUN}_${OCEAN_MODEL}_nowcast.in >> ${MODEL_LOG_NOWCAST}
     if [ $OFS == wcofs_da ]; then
+      # TODO: WCOFS DA
       mpiexec -n ${TOTAL_TASKS} --ppn 64 --cpu-bind depth --depth 2 $EXECnos/${RUN}_roms_mpi ${RUN}_${OCEAN_MODEL}_nowcast.in >> ${MODEL_LOG_NOWCAST}
     else	     
-      mpiexec -n ${TOTAL_TASKS} $EXECnos/${RUN}_roms_mpi ${RUN}_${OCEAN_MODEL}_nowcast.in >> ${MODEL_LOG_NOWCAST}
+      #PT mpiexec -n ${TOTAL_TASKS} $EXECnos/${RUN}_roms_mpi ${RUN}_${OCEAN_MODEL}_nowcast.in >> ${MODEL_LOG_NOWCAST}
+      ${MPIEXEC} ${MPIOPTS} $EXECnos/${RUN}_roms_mpi ${RUN}_${OCEAN_MODEL}_nowcast.in >> ${MODEL_LOG_NOWCAST}
     fi
 
     export err=$?
@@ -813,7 +817,8 @@ then
   elif [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]
   then
 #    mpirun $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_NOWCAST
-    mpiexec -n ${TOTAL_TASKS} $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_NOWCAST
+    #PT mpiexec -n ${TOTAL_TASKS} $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_NOWCAST
+    $MPIEXEC $MPIOPTS $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_NOWCAST
    if [ -s ${DATA}/$STA_EDGE_CTL -a ! -s ${FIXofs}/$STA_EDGE_CTL ]; then
      cp -p ${DATA}/$STA_EDGE_CTL ${FIXofs}/$STA_EDGE_CTL
    fi
@@ -1573,7 +1578,9 @@ then
 # 2   Execute ocean model of ROMS; where ${RUN}_roms_forecast.in is created by nos_ofs_reformat_roms_ctl.sh
   if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
 #     mpirun $EXECnos/${RUN}_roms_mpi ./${RUN}_${OCEAN_MODEL}_forecast.in >> ${MODEL_LOG_FORECAST}
-     mpiexec -n ${TOTAL_TASKS} $EXECnos/${RUN}_roms_mpi ./${RUN}_${OCEAN_MODEL}_forecast.in >> ${MODEL_LOG_FORECAST}
+#PT     mpiexec -n ${TOTAL_TASKS} $EXECnos/${RUN}_roms_mpi ./${RUN}_${OCEAN_MODEL}_forecast.in >> ${MODEL_LOG_FORECAST}
+
+      ${MPIEXEC} ${MPIOPTS} $EXECnos/${RUN}_roms_mpi ./${RUN}_${OCEAN_MODEL}_forecast.in >> ${MODEL_LOG_FORECAST}
     export err=$?
     if [ $err -ne 0 ]
     then
@@ -1647,7 +1654,8 @@ then
   then
     rm -f $MODEL_LOG_FORECAST
 #    mpirun $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_FORECAST
-    mpiexec -n ${TOTAL_TASKS} $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_FORECAST
+    #PT mpiexec -n ${TOTAL_TASKS} $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_FORECAST
+    ${MPIEXEC} ${MPIOPTS} $EXECnos/fvcom_${RUN} --casename=$RUN > $MODEL_LOG_FORECAST
     export err=$?
     if [ $err -ne 0 ]
     then
