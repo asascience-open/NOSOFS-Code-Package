@@ -4,6 +4,7 @@
 #HOMEnos=`pwd`
 #export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
 #export HOMEnos=/lfs/h1/nos/nosofs/noscrub/aijun.zhang/tmp/roms
+
 BUILD_VERSION_FILE=$HOMEnos/versions/build.ver
 if [ -f $BUILD_VERSION_FILE ]; then
  . $BUILD_VERSION_FILE
@@ -12,41 +13,33 @@ else
    exit
 fi
 
-
-export COMP_F=ftn
-export COMP_F_MPI90=ftn
-export COMP_F_MPI=ftn
-export COMP_ICC=cc
-export COMP_CC=cc
-export COMP_CPP=cpp
-export COMP_MPCC=cc
-
 module purge
-printenv SHELL
-module purge
-module load envvar/$envvars_ver
-# Loading Intel Compiler Suite
-module load PrgEnv-intel/${PrgEnv_intel_ver}
-module load craype/${craype_ver}
-module load intel/${intel_ver}
-module load cray-mpich/${cray_mpich_ver}
-module load cray-pals/${cray_pals_ver}
-#Set other library variables
+module use -a $HOMEnos/modulefiles
+module load ioos-sb.intel_x86_64
+
+# module load envvar/$envvars_ver
+## Loading Intel Compiler Suite
+#module load PrgEnv-intel/${PrgEnv_intel_ver}
+#module load craype/${craype_ver}
+#module load intel/${intel_ver}
+#module load cray-mpich/${cray_mpich_ver}
+#module load cray-pals/${cray_pals_ver}
+##Set other library variables
+##module load netcdf/${netcdf_ver}
+##module load hdf5/${hdf5_ver}
+#module load bacio/${bacio_ver}
+#module load w3nco/${w3nco_ver}
+#module load w3emc/${w3emc_ver}
+#module load g2/${g2_ver}
+#module load zlib/${zlib_ver}
+#module load libpng/${libpng_ver}
+#module load bufr/${bufr_ver}
+#module load jasper/${jasper_ver}
+##
+##Set other library variables
 #module load netcdf/${netcdf_ver}
 #module load hdf5/${hdf5_ver}
-module load bacio/${bacio_ver}
-module load w3nco/${w3nco_ver}
-module load w3emc/${w3emc_ver}
-module load g2/${g2_ver}
-module load zlib/${zlib_ver}
-module load libpng/${libpng_ver}
-module load bufr/${bufr_ver}
-module load jasper/${jasper_ver}
-#
-#Set other library variables
-module load netcdf/${netcdf_ver}
-module load hdf5/${hdf5_ver}
-module load subversion/${subversion_ver}
+#module load subversion/${subversion_ver}
 
 export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
@@ -56,7 +49,6 @@ export LIBnos=$HOMEnos/lib
 #gmake clean
 #./build_tbofs.sh
 
-#exit
 
 #  Compile ocean model of ROMS for CBOFS
 cd $SORCnos/ROMS.fd
@@ -109,7 +101,6 @@ else
   echo 'roms executable for CIOFS is not created'
 fi
 
-gmake clean
 
 #  Compile ocean model of ROMS for WCOFS (which includes 3 models)
 cd $SORCnos/ROMS.fd
@@ -120,8 +111,6 @@ if [ -s  wcofs_roms_mpi ]; then
 else
   echo 'roms executable for WCOFS is not created'
 fi
-
-gmake clean
 
 # Compile WCOFS_FREE
 cd $SORCnos/ROMS.fd

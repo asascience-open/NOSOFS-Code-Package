@@ -117,7 +117,9 @@ fi
 # 4. Compile ocean models of ROMS-based OFS 
 # cbofs, dbofs, tbofs,ciofs, gomofs, wcofs, wcofs_da, wcofs_free
 cd $SORCnos/ROMS.fd
-# ./COMPILE_ROMS.sh
+./COMPILE_ROMS.sh
+
+exit
 
 # 5. Compile ocean models of FVCOM-based OFS
 # leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs
