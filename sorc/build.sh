@@ -37,7 +37,7 @@ printenv SHELL
 set +x
 module use -a $HOMEnos/modulefiles
 #module load wcoss2_prod
-module load ioos-sb.intel_x86_64
+module load intel_x86_64
 set -x
 
 if [ ! -s $EXECnos ]
