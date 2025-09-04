@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x 
+# set -x 
 #############################################################################
 #                                                                             #
 # Compiles source codes of nosofs, moves executables to exec and cleans up    #
@@ -57,27 +57,55 @@ echo "fcodes: "
 echo "$fcodes"
 
 echo "debugging not building all of the prep stuff"
-fcodes=""
+#err png lib  nos_ofs_create_forcing_met
+#err png nos_ofs_create_forcing_met_fvcom
+
+fcodes="
+nos_creofs_wl_offset_correction
+nos_ofs_adjust_tides
+nos_ofs_met_file_search
+nos_ofs_read_restart
+nos_ofs_read_restart_fvcom
+nos_ofs_reformat_ROMS_CTL
+nos_ofs_rename
+nos_ofs_residual_water_calculation
+nos_ofs_utility
+"
+
+morefcodes="
+nos_ofs_create_forcing_nudg
+nos_ofs_create_forcing_obc
+nos_ofs_create_forcing_obc_fvcom
+nos_ofs_create_forcing_obc_fvcom_gl
+nos_ofs_create_forcing_obc_fvcom_nest
+nos_ofs_create_forcing_obc_tides
+nos_ofs_create_forcing_river
+"
 
 echo " FORTRAN codes found: "${fcodes}.f
 if [ $# -eq 0 ]; then
+
   # nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
-  cd $SORCnos/nos_ofs_utility.fd
-  make clean
-  make
-  result=$?
-  if [ $result -ne 0 ]; then
-    echo "ERROR building nos_ofs_utility.fd"
-    exit $result
-  else
-    echo "SUCCESS: nos_ofs_utility.fd built"
-  fi
-  make install
-  make clean
+#  cd $SORCnos/nos_ofs_utility.fd
+#  make clean
+#  make
+#  result=$?
+#  if [ $result -ne 0 ]; then
+#    echo "ERROR building nos_ofs_utility.fd"
+#    exit $result
+#  else
+#    echo "SUCCESS: nos_ofs_utility.fd built"
+#  fi
+#  make install
+#  make clean
 
   for code in $fcodes ; do
     if [ $code != "nos_ofs_utility" ]; then	   
+      echo ""
+      echo ""
       echo "Creating $code "
+      echo "-------------------------------------"
+      echo "-------------------------------------"
       cd $SORCnos/${code}.fd
       make clean
       make 
@@ -114,6 +142,7 @@ if [ "$1" = "debug" ]; then
    done
 fi
 
+exit
 # 4. Compile ocean models of ROMS-based OFS 
 # cbofs, dbofs, tbofs,ciofs, gomofs, wcofs, wcofs_da, wcofs_free
 cd $SORCnos/ROMS.fd

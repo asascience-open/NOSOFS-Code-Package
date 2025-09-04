@@ -15,7 +15,7 @@ fi
 
 module purge
 module use -a $HOMEnos/modulefiles
-module load ioos-sb.intel_x86_64
+module load intel_x86_64
 
 # module load envvar/$envvars_ver
 ## Loading Intel Compiler Suite

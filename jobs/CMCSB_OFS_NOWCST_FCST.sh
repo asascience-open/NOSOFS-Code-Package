@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x
+#set -x
 
 if [ $# -ne 2 ] ; then
   echo "Usage: $0 YYYYMMDD HH"
@@ -18,7 +18,6 @@ export KEEPDATA=YES
 NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
 
-
 export I_MPI_OFI_LIBRARY_INTERNAL=1
 
 module use -a $HOMEnos/modulefiles
@@ -31,7 +30,8 @@ module list
 export I_MPI_DEBUG=1
 
 export OFS=${OFS:-cbofs}
-export PREFIXNOS="nosofs.$OFS"
+#export PREFIXNOS="nosofs.$OFS"
+export PREFIXNOS=$OFS
 
 NOWCAST=${NOWCAST:-NO}      # Run the nowcast?
 FORECAST=${FORECAST:-YES}    # Run the forecast?
@@ -58,7 +58,7 @@ export cyc=${HH}
 export nosofs_ver=v3.6.6
 export NWROOT=/save
 export COMROOT=/com
-export DATA=/ptmp/$USER/$OFS.${CDATE}${HH}
+export DATA=$PTMP/$OFS.${CDATE}${HH}
 export jobid=fcst.$$
 
 
@@ -119,7 +119,10 @@ export PARMnos=${PARMnos:-${HOMEnos}/parm}
 export USHnos=${USHnos:-${HOMEnos}/ush}
 export SCRIPTSnos=${SCRIPTSnos:-${HOMEnos}/scripts}
 export PYnos=${PYnos:-${HOMEnos}/ush/pysh}
-export LD_PRELOAD=${NETCDF_LIBRARIES}/libnetcdff.so:${LD_PRELOAD}
+
+#PT I don't think this is needed for us:
+#PT export LD_PRELOAD=${NETCDF_LIBRARIES}/libnetcdff.so:${LD_PRELOAD}
+
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${NOSLIBS_DIR}/proj.4-master/lib64
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOMEnos}/sorc/FVCOM.fd/FVCOM_source/libs/proj.4-master/lib64
 
@@ -247,8 +250,8 @@ cat $pgmout
 
 postmsg "$jlogfile" "$0 completed normally"
 
-# Save the log file
-cp -p $DATA/nos.*.log $COMOUT
+# Save any log files
+cp -p $DATA/*.log $COMOUT
 
 ##############################
 # Remove the Temporary working directory
@@ -257,7 +260,7 @@ if [ "${KEEPDATA^^}" != YES ]; then
   rm -rf $DATA
 fi
 
-if [ $envir == 'dev' ]; then
+if [[ $envir == 'dev' ]]; then
   RPTDIR=/lfs/h1/nos/ptmp/$LOGNAME/rpt/${nosofs_ver}
   cp -p ${RPTDIR}/${OFS}_nf_${cyc}.out ${RPTDIR}/${OFS}_nf_${cyc}.out.${pbsid}
   cp -p ${RPTDIR}/${OFS}_nf_${cyc}.err ${RPTDIR}/${OFS}_nf_${cyc}.err.${pbsid}

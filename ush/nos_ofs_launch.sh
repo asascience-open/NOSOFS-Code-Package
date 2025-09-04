@@ -139,6 +139,7 @@ if [ ${OCEAN_MODEL} != "ROMS" -a ${OCEAN_MODEL} != "roms" ]; then
     cp -p ${FIXofs}/$VGRID_CTL $DATA/.
   fi
 fi
+
 if [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]; then
   if [ $OFS = leofs -o $OFS = lmhofs -o $OFS = ngofs2 -o $OFS = sfbofs ]; then
   if [ -d ${FIXofs}/$STA_EDGE_CTL -o ! -s ${FIXofs}/$STA_EDGE_CTL ]; then
@@ -571,7 +572,10 @@ if [ "$runtype" = "prep" ] || [ "$runtype" = "PREP" ]; then
       echo $nvrt >> Fortran_read_restart.ctl
     fi
     export pgm=nos_ofs_read_restart
-. prep_step
+
+#PT Skipping prep_step on sandbox
+
+# . prep_step
     if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then 
       $EXECnos/nos_ofs_read_restart < Fortran_read_restart.ctl > Fortran_read_restart.log
       export err=$?
@@ -774,6 +778,10 @@ export MODEL_LOG_NOWCAST=${PREFIXNOS}.${cycle}.${PDY1}.nowcast.log
 export MODEL_LOG_FORECAST=${PREFIXNOS}.${cycle}.${PDY1}.forecast.log
 export RUNTIME_CTL_NOWCAST=${PREFIXNOS}.${cycle}.${PDY1}.nowcast.in
 export RUNTIME_CTL_FORECAST=${PREFIXNOS}.${cycle}.${PDY1}.forecast.in
+echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
+echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
+echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
+
 if [ -z "${OFS##wcofs_da*}" ]; then
   export COMOUTrst1=$COMrst/${OFS_NF}.${PDY1}
   export RST_OUT_NOWCAST_NF1=${OFS_NF}.t${HH}z.${PDY1}.rst.nowcast.nc

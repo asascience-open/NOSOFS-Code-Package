@@ -82,14 +82,28 @@ echo "Starting nos_ofs_nowcast_forecast.sh at : `date`"
 
 RUNTYPE=$1 
 RUN=$OFS 
+time_hotstart=${PDY}${cyc}
+
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo ""
+echo "time_hotstart is $time_hotstart"
+echo ""
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+echo "************************************************"
+
 if [ -s $COMOUT/time_hotstart.${cycle} ]; then
   read time_hotstart < $COMOUT/time_hotstart.${cycle}
   export time_hotstart
 else
-  echo "time_hotstart is not defined yet"
-  echo "FATAL ERROR "
-  echo "Please define time_hotstart "
-  exit
+  export time_hotstart 
 fi
 
 if [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]
@@ -203,7 +217,7 @@ then
   if [ ! -s  $FIXofs/global_to_local.prop ]; then   # bypass ParMetis
       echo " FATAL ERROR : $FIXofs/global_to_local.prop is not found "
       echo please provide $FIXofs/global_to_local.prop
-      exit
+      exit 2
   else
       max_cpunum=-999
       exec 5<&0 <  $FIXofs/'global_to_local.prop'
@@ -223,7 +237,7 @@ then
         echo "total number of cpu in global_to_local.prop is not equal TOTAL_TASK " $max_cpunum  $TOTAL_TASKS
         echo " total number of cpu in global_to_local.prop has to be  equal to TOTAL_TASK "
         echo "Please provide a new $FIXofs/global_to_local.prop "
-        exit
+        exit 3
       fi
   fi
 
@@ -329,6 +343,11 @@ echo "Preparing input files for ${RUN} $RUNTYPE "
 echo '-----------------------'
 seton
 
+###################
+#####         #####
+##### NOWCAST #####
+#####         #####
+###################
 if [ $RUNTYPE == "NOWCAST" -o $RUNTYPE == "nowcast" ]
 then
   if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]
@@ -1232,10 +1251,15 @@ then
     cp -p $DATA/${PREFIXNOS}.t${cyc}z.${PDY}.avg.n*.nc $COMOUT/
   fi 
 fi
+###############
+# NOWCAST END #
+###############
 
-
-#### FORECAST
- 
+####################
+#####          #####
+##### FORECAST #####
+#####          #####
+#################### 
 if [ $RUNTYPE == "FORECAST" -o $RUNTYPE == "forecast" ]
 then
 
@@ -1463,6 +1487,7 @@ then
   fi
 
 # 1.h forecast cntl file
+echo "DEBUGGING -----------------------------------------------"
   if [ -f $DATA/${RUN}_${OCEAN_MODEL}_forecast.in ]
   then
     echo "   $DATA/${RUN}_${OCEAN_MODEL}_forecast.in existed "
@@ -1503,30 +1528,36 @@ then
   fi
 
 #1.h Tide data 
+#PT  I am not sure why the fix/ .ctl files set this to a generic ofs.roms.tides.nc file
+#PT Mismatch between what is in roms.in file and what is expected by the scripts
+#PT DATA is PTMP
   if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]
   then
-    if [ -f $DATA/$HC_FILE_OFS ]
-    then
-       echo "   $DATA/$HC_FILE_OFS existed "
-    elif [ -s $COMOUT/$HC_FILE_OFS ]
-    then
-      cp -p $COMOUT/$HC_FILE_OFS $HC_FILE_OFS
-    else
-      msg="FATAL ERROR: Tide Constituent file for ROMS OBC is not found"
-      postmsg "$jlogfile" "$msg"
-      postmsg "$nosjlogfile" "$msg"
-      setoff
-      echo ' '
-      echo '*****************************************************************'
-      echo '*** FATAL ERROR : Tide Constituent file for ROMS OBC is not found'
-      echo '*****************************************************************'
-      echo ' '
-      echo $msg
-      seton
-      touch err.${RUN}.$PDY1.t${HH}z
-      err_exit "Tide constituent file for ROMS OBC is not found: $COMOUT/$HC_FILE_OFS"
-    fi
-  fi
+     if [ -f $DATA/$HC_FILE_OFS ]
+     then
+        echo "   $DATA/$HC_FILE_OFS existed "
+     elif [ -s $COMOUT/$HC_FILE_OFS ]
+     then
+       cp -p $COMOUT/$HC_FILE_OFS $HC_FILE_OFS
+     elif [ -s $COMOUT/$OBC_TIDALFORCING_FILE ]
+     then
+       cp -p $COMOUT/$OBC_TIDALFORCING_FILE .
+     else
+       msg="FATAL ERROR: Tide Constituent file for ROMS OBC is not found"
+       postmsg "$jlogfile" "$msg"
+       postmsg "$nosjlogfile" "$msg"
+       setoff
+       echo ' '
+       echo '*****************************************************************'
+       echo '*** FATAL ERROR : Tide Constituent file for ROMS OBC is not found'
+       echo '*****************************************************************'
+       echo ' '
+       echo $msg
+       seton
+       touch err.${RUN}.$PDY1.t${HH}z
+       err_exit "Tide constituent file for ROMS OBC is not found: $COMOUT/$HC_FILE_OFS"
+     fi
+   fi
 
 #1.i Nowcast RST file 
   if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]
@@ -1928,6 +1959,9 @@ then
   if [ -s $DATA/${PREFIXNOS}*.avg.forecast.nc ]; then
     cp -p $DATA/${PREFIXNOS}*.avg.f*.nc $COMOUT/
   fi 
+
+#save the log to COMOUT
+  cp -p $DATA/${MODEL_LOG_FORECAST} $COMOUT/${MODEL_LOG_FORECAST}
 
 fi 
 
