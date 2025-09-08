@@ -1527,20 +1527,28 @@ echo "DEBUGGING -----------------------------------------------"
     err_exit "ROMS runtime input file for nowcast is not found: $COMOUT/${RUNTIME_CTL_FORECAST}"
   fi
 
+# Clim data - copy clim NUDG_FORCING_FILE (also called CLMNAME in ocean.in) ROMS to DATA
+#PT Added for Sandbox, not running prep
+  if [ ${OFS} == "wcofs" -o ${OFS} == "gomofs" ]; then
+      if [ -f $DATA/$NUDG_FORCING_FILE ]; then
+        echo "   $DATA/$NUDG_FORCING_FILES existed "
+      elif [ -f $COMOUT/$NUDG_FORCING_FILE ]; then
+        cp -p $COMOUT/$NUDG_FORCING_FILE .
+      fi
+  fi
+      
+
 #1.h Tide data 
 #PT  I am not sure why the fix/ .ctl files set this to a generic ofs.roms.tides.nc file
 #PT Mismatch between what is in roms.in file and what is expected by the scripts
 #PT DATA is PTMP
   if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]
   then
-     if [ -f $DATA/$HC_FILE_OFS ]
-     then
-        echo "   $DATA/$HC_FILE_OFS existed "
-     elif [ -s $COMOUT/$HC_FILE_OFS ]
-     then
+     if [ -f $DATA/$HC_FILE_OFS ]; then
+       echo "   $DATA/$HC_FILE_OFS existed "
+     elif [ -s $COMOUT/$HC_FILE_OFS ]; then
        cp -p $COMOUT/$HC_FILE_OFS $HC_FILE_OFS
-     elif [ -s $COMOUT/$OBC_TIDALFORCING_FILE ]
-     then
+     elif [ -s $COMOUT/$OBC_TIDALFORCING_FILE ]; then
        cp -p $COMOUT/$OBC_TIDALFORCING_FILE .
      else
        msg="FATAL ERROR: Tide Constituent file for ROMS OBC is not found"

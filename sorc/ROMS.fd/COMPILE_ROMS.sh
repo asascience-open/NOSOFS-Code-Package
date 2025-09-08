@@ -1,4 +1,8 @@
 #!/bin/sh
+export nosofs_ver=3.6.6
+export HOMEnos=$(dirname $(dirname $PWD))
+export HOMEnos=${HOMEnos:-${PACKAGEROOT:?}/nosofs.${nosofs_ver:?}}
+
 #export HOMEnos=/lfs/h1/nos/nosofs/noscrub/$LOGNAME/packages/nosofs.v3.7.2
 #cd ../..
 #HOMEnos=`pwd`
@@ -45,80 +49,30 @@ export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
 
+models='cbofs ciofs dbofs gomofs tbofs wcofs wcofs_free'
 
-#  Compile ocean model of ROMS for CBOFS
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_cbofs.sh
-if [ -s  cbofs_roms_mpi ]; then
-  mv cbofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for DBOFS is not created'
-fi
+for model in $models
+do
 
-exit
+  echo ""
+  echo "Compiling ROMS ocean model for ${model^^}"
+  echo "------------------------------------------------"
+  if [[ $model == "eccofs" ]]; then
+    cd $SORCnos/ROMS.eccofs
+  else
+    cd $SORCnos/ROMS.fd
+  fi
+  gmake clean
+  ./build_${model}.sh
+  if [ -s ${model}_roms_mpi ]; then
+    mv ${model}_roms_mpi $EXECnos/.
+    gmake clean
+  else
+    echo "error: roms executable for ${model^^} is not created"
+  fi
+done
 
-#  Compile ocean model of ROMS for CBOFS
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_dbofs.sh
-if [ -s  dbofs_roms_mpi ]; then
-  mv dbofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for DBOFS is not created'
-fi
-
-#  Compile ocean model of ROMS for TBOFS
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_tbofs.sh
-if [ -s  tbofs_roms_mpi ]; then
-  mv tbofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for TBOFS is not created'
-fi
-
-#  Compile ocean model of ROMS for GoMOFS
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_gomofs.sh
-if [ -s  gomofs_roms_mpi ]; then
-  mv gomofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for GOMOFS is not created'
-fi
-
-
-#  Compile ocean model of ROMS for CIOFS
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_ciofs.sh
-if [ -s  ciofs_roms_mpi ]; then
-  mv ciofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for CIOFS is not created'
-fi
-
-
-#  Compile ocean model of ROMS for WCOFS (which includes 3 models)
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_wcofs.sh
-if [ -s  wcofs_roms_mpi ]; then
-  mv wcofs_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for WCOFS is not created'
-fi
-
-# Compile WCOFS_FREE
-cd $SORCnos/ROMS.fd
-gmake clean
-./build_wcofs_free.sh
-if [ -s  wcofs_free_roms_mpi ]; then
-  mv wcofs_free_roms_mpi $EXECnos/.
-else
-  echo 'roms executable for WCOFS_FREE is not created'
-fi
+exit 
 
 # Compile WCOFS_DA
 #cd $SORCnos/ROMS.fd/Lib/ARPACK
@@ -134,7 +88,6 @@ if [ -s  wcofs_da_roms_mpi ]; then
 else
   echo 'roms executable for WCOFS_DA is not created'
 fi
-
 gmake clean
 
 
