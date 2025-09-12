@@ -50,6 +50,13 @@ then
   mkdir -p $LIBnos
 fi
 
+# 5. Compile ocean models of FVCOM-based OFS
+# leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs
+cd $SORCnos/FVCOM.fd
+./COMPILE_FVCOM.sh
+
+exit
+
 # 2. Create all executions of nosofs framework (COMF) 
 cd $SORCnos
 fcodes=`ls -d nos*.fd | sed 's/\.fd//g'`
