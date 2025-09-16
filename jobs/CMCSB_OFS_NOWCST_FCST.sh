@@ -19,10 +19,9 @@ NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
 
 export I_MPI_OFI_LIBRARY_INTERNAL=1
+export LD_LIBRARY_PATH=$HOMEnos/lib:$LD_LIBRARY_PATH
 
 module use -a $HOMEnos/modulefiles
-
-#module load intel_skylake_512
 module load intel_x86_64
 
 module list
@@ -215,7 +214,7 @@ export CONTINUE_FORECAST
 if [[ $NOWCAST == "YES" ]] ; then
 
   $SCRIPTSnos/exnos_ofs_nowcast.sh $OFS
-  ((result+=$?))
+  result=$?
 
   echo "-----------------------------------------------------"
   echo "-----------------------------------------------------"
@@ -232,7 +231,7 @@ fi
 if [[ $FORECAST == "YES" ]] ; then
 
   $SCRIPTSnos/exnos_ofs_forecast.sh $OFS
-  ((result+=$?))
+  result=$?
 
   echo "-----------------------------------------------------"
   echo "-----------------------------------------------------"
@@ -268,4 +267,3 @@ fi
 
 date
 exit $result
-
