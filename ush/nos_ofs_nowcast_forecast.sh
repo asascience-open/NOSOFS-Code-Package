@@ -79,6 +79,7 @@ echo "Starting nos_ofs_nowcast_forecast.sh at : `date`"
 
 #export MP_PGMMODEL=mpmd
 #export MP_CMDFILE=cmdfile
+export errors=0
 
 RUNTYPE=$1 
 RUN=$OFS 
@@ -334,8 +335,15 @@ fi
 if [ -s ${FIXofs}/${PREFIXNOS}_z0_vary.nc ]; then
    cp -p ${FIXofs}/${PREFIXNOS}_z0_vary.nc $DATA/${PREFIXNOS}_z0_vary.nc
 fi
+###############################################################################
+###############################################################################
 
 
+
+
+
+
+###############################################################################
 # --------------------------------------------------------------------------- #
 # 1.  Get files that are used by most (child) scripts
 
@@ -348,6 +356,9 @@ seton
 ##### NOWCAST #####
 #####         #####
 ###################
+
+###############################################################################
+###############################################################################
 if [ $RUNTYPE == "NOWCAST" -o $RUNTYPE == "nowcast" ]
 then
   if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]
@@ -848,7 +859,7 @@ then
     then
       echo "Running ocean model for $RUNTYPE did not complete normally"
       msg="Running ocean model for $RUNTYPE did not complete normally"
-      echo "Ocean model for $RUNTYPE failed. mpirun exit error: $err" >> $MODEL_LOG_FORECAST
+      echo "Ocean model for $RUNTYPE failed. mpirun exit error: $err" >> $MODEL_LOG_NOWCAST
       postmsg "$jlogfile" "$msg"
       postmsg "$nosjlogfile" "$msg"
       err_exit "$msg"
@@ -1256,7 +1267,24 @@ fi
 ###############
 # NOWCAST END #
 ###############
+###############################################################################
+###############################################################################
+###############################################################################
 
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
 ####################
 #####          #####
 ##### FORECAST #####
@@ -1288,6 +1316,7 @@ then
       echo $msg
       seton
 #      touch err.${RUN}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No MET control file for forecast: ${COMOUT}/$RUNTIME_MET_CTL_FORECAST"
     fi
 
@@ -1314,6 +1343,7 @@ then
       echo $msg
       seton
       touch err.${RUN}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No river forcing file: $COMOUT/$RIVER_FORCING_FILE"
     fi
   elif [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]
@@ -1341,6 +1371,7 @@ then
       echo $msg
       seton
       touch err.${RUN}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No river forcing file: $COMOUT/${RIVER_FORCING_FILE}"
     fi
   elif [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]
@@ -1370,6 +1401,7 @@ then
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No river forcing for nowcast/forecast: $COMOUT/${RIVER_FORCING_FILE}"
     fi
   fi
@@ -1397,6 +1429,7 @@ then
       echo $msg
       seton
 #      touch err.${RUN}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No OBC forcing for nowcast/forecast: $COMOUT/$OBC_FORCING_FILE"
     fi
   else
@@ -1424,6 +1457,7 @@ then
       echo $msg
       seton
       touch err.${RUN}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No OBC forcing file: $COMOUT/$OBC_FORCING_FILE_EL"
      fi 
     fi
@@ -1453,8 +1487,8 @@ then
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No meteorological forcing for forecast: $COMOUT/$MET_NETCDF_1_FORECAST"
-        
     fi  
   else
     if [ -f $DATA/$MET_NETCDF_1_FORECAST ]
@@ -1475,6 +1509,7 @@ then
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No meteorological forcing for forecast: $COMOUT/$MET_NETCDF_1_FORECAST"
     fi  
   fi
@@ -1526,6 +1561,7 @@ echo "DEBUGGING -----------------------------------------------"
     echo $msg
     seton
     touch err.${RUN}.$PDY1.t${HH}z
+    ((errors++))
     err_exit "ROMS runtime input file for nowcast is not found: $COMOUT/${RUNTIME_CTL_FORECAST}"
   fi
 
@@ -1565,6 +1601,7 @@ echo "DEBUGGING -----------------------------------------------"
        echo $msg
        seton
        touch err.${RUN}.$PDY1.t${HH}z
+       ((errors++))
        err_exit "Tide constituent file for ROMS OBC is not found: $COMOUT/$HC_FILE_OFS"
      fi
    fi
@@ -1591,6 +1628,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No restart file for forecast: $COMOUT/$RST_OUT_NOWCAST"
     fi
   else
@@ -1612,6 +1650,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No restart file for forecast: $COMOUT/$RST_OUT_NOWCAST"
     fi
   fi 
@@ -1627,8 +1666,10 @@ echo "DEBUGGING -----------------------------------------------"
     then
       echo "Running ocean model ${RUN}_roms_mpi for $RUNTYPE did not complete normally"
       msg="Running ocean model ${RUN}_roms_mpi for $RUNTYPE did not complete normally"
+      echo "Ocean model for $RUNTYPE failed. mpirun exit error: $err" >> $MODEL_LOG_FORECAST
       postmsg "$jlogfile" "$msg"
       postmsg "$nosjlogfile" "$msg"
+      ((errors++))
       err_exit "$msg"
 #    else
 #      echo "Running ocean model ${RUN}_roms_mpi completed normally"
@@ -1643,12 +1684,15 @@ echo "DEBUGGING -----------------------------------------------"
       grep "ROMS/TOMS - Blows up" ${MODEL_LOG_FORECAST} > corms.fcst
       grep "Blowing-up" ${MODEL_LOG_FORECAST} >> corms.fcst
       grep "Abnormal termination: BLOWUP" ${MODEL_LOG_FORECAST} >> corms.fcst
+      grep "failed" ${MODEL_LOG_FORECAST} >> corms.fcst
+      grep "Failed" ${MODEL_LOG_FORECAST} >> corms.fcst
     fi
     if [ -s  corms.fcst ]
     then
       echo "${RUN} FORECAST RUN OF CYCLE t${HH}z ON $PDY FAILED 00"  >> $cormslogfile 
       echo "FORECAST_RUN DONE 0"  >> $cormslogfile
       export err=99; err_chk
+      ((errors++))
     else
       echo "${RUN} FORECAST RUN  OF CYCLE t${HH}z ON $PDY COMPLETED SUCCESSFULLY 100" >> $cormslogfile
       echo "FORECAST_RUN DONE 100"  >> $cormslogfile
@@ -1702,10 +1746,11 @@ echo "DEBUGGING -----------------------------------------------"
     then
       echo "Running ocean model for $RUNTYPE did not complete normally"
       msg="Running ocean model  for $RUNTYPE did not complete normally"
+      echo "Ocean model for $RUNTYPE failed. mpirun exit error: $err" >> $MODEL_LOG_FORECAST
       postmsg "$jlogfile" "$msg"
       postmsg "$nosjlogfile" "$msg"
+      ((errors++))
       err_exit "$msg"
-      echo "Ocean model for $RUNTYPE failed. mpirun exit error: $err" >> $MODEL_LOG_FORECAST
 #    else
 #      echo "Running ocean model for $RUNTYPE completed normally"
 #      msg="Running ocean model  for $RUNTYPE completed normally"
@@ -1725,6 +1770,7 @@ echo "DEBUGGING -----------------------------------------------"
       then
         echo "${RUN} FORECAST RUN OF CYCLE t${HH}z ON $YYYY$MM$DD FAILED 00"  >> $cormslogfile 
         echo "FORECAST_RUN DONE 0"  >> $cormslogfile
+        ((errors++))
         export err=99; err_chk
       else
         echo "${RUN} FORECAST RUN  OF CYCLE t${HH}z ON $YYYY$MM$DD COMPLETED SUCCESSFULLY 100" >> $cormslogfile
@@ -1766,6 +1812,7 @@ echo "DEBUGGING -----------------------------------------------"
     else
         echo "${RUN} FORECAST RUN OF CYCLE t${HH}z ON $YYYY$MM$DD FAILED 00"  >> $cormslogfile 
         echo "FORECAST_RUN DONE 0"  >> $cormslogfile
+        ((errors++))
         export err=99; err_chk
     fi  
 
@@ -1794,6 +1841,7 @@ echo "DEBUGGING -----------------------------------------------"
     then
        echo "${OFS} FORECAST RUN OF CYCLE t${HH}z ON $YYYY$MM$DD FAILED 00"  >> $cormslogfile 
        echo "FORECAST_RUN DONE 0"  >> $cormslogfile
+       ((errors++))
        export err=99; err_chk
     else
        echo "${OFS} FORECAST RUN OF CYCLE t${HH}z ON $YYYY$MM$DD COMPLETED SUCCESSFULLY 100" >> $cormslogfile
@@ -1806,6 +1854,7 @@ echo "DEBUGGING -----------------------------------------------"
       msg="Running ocean model  for $RUNTYPE did not complete normally"
       postmsg "$jlogfile" "$msg"
       postmsg "$nosjlogfile" "$msg"
+      ((errors++))
       err_exit "$msg"
     else
       echo "Running ocean model for $RUNTYPE completed normally"
@@ -1867,6 +1916,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo $msg
       seton
 #      touch err.${OFS}.$PDY1.t${HH}z
+      ((errors++))
       err_exit "No control file for combining field outputs of $RUNTYPE: $FIXofs/$RUNTIME_COMBINE_NETCDF"
     fi
  
@@ -1880,6 +1930,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo "Running nos_ofs_combine_netcdf_out_selfe for $RUNTYPE did not complete normally"
       msg="Running nos_ofs_combine_netcdf_out_selfe for $RUNTYPE did not complete normally"
       postmsg "$jlogfile" "$msg"
+      ((errors++))
       err_exit "$msg"
     else
       echo "Running nos_ofs_combine_netcdf_out_selfe for $RUNTYPE completed normally"
@@ -1904,6 +1955,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo ' '
       echo $msg
       seton
+      ((errors++))
       err_exit "No combine NetCDF station control file: ${COMOUT}/$RUNTIME_COMBINE_NETCDF_STA_FORECAST"
     fi
     if [ -s $FIXofs/${STA_NETCDF_CTL} ]
@@ -1922,6 +1974,7 @@ echo "DEBUGGING -----------------------------------------------"
       echo "Running nos_ofs_combine_station_netcdf_selfe for $RUNTYPE did not complete normally"
       msg="Running nos_ofs_combine_station_netcdf_selfe for $RUNTYPE did not complete normally"
       postmsg "$jlogfile" "$msg"
+      ((errors++))
       err_exit "$msg"
     else
       echo "Running nos_ofs_combine_station_netcdf_selfe for $RUNTYPE completed normally"
@@ -1985,6 +2038,8 @@ fi
   echo ' '
   echo '                     *** End of NOS OFS NOWCAST/FORECAST SIMULATIONS ***'
   echo ' '
+
+exit $errors
 
 # End of NOS OFS Nowcast script ------------------------------------------- #
 

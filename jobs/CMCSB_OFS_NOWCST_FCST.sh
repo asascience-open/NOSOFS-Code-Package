@@ -1,5 +1,5 @@
 #!/bin/sh
-#set -x
+# set -x
 
 if [ $# -ne 2 ] ; then
   echo "Usage: $0 YYYYMMDD HH"
@@ -19,6 +19,8 @@ NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
 
 export I_MPI_OFI_LIBRARY_INTERNAL=1
+
+# Make metis and other libraries visible by ld
 export LD_LIBRARY_PATH=$HOMEnos/lib:$LD_LIBRARY_PATH
 
 module use -a $HOMEnos/modulefiles
@@ -119,7 +121,6 @@ export USHnos=${USHnos:-${HOMEnos}/ush}
 export SCRIPTSnos=${SCRIPTSnos:-${HOMEnos}/scripts}
 export PYnos=${PYnos:-${HOMEnos}/ush/pysh}
 
-#PT I don't think this is needed for us:
 #PT export LD_PRELOAD=${NETCDF_LIBRARIES}/libnetcdff.so:${LD_PRELOAD}
 
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${NOSLIBS_DIR}/proj.4-master/lib64
@@ -135,8 +136,6 @@ else
   setpdy.sh
   . ./PDY
 fi
-
-#export PDY=20240518
 
 export time_nowcastend=$PDY${cyc}
 ##############################################
@@ -267,3 +266,5 @@ fi
 
 date
 exit $result
+
+

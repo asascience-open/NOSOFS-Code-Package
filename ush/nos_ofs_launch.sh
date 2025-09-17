@@ -41,7 +41,8 @@
 #        Purpose: For Upgraded NGOFS Implementation
 #
 #### END of Unix Script DOC BLOCK--------------------------------------------------- 
-set -x
+# set -x
+
 if [ $# -lt 2 ];  then
   echo " ***Error: You must supply at least two arguments for model run " 
   echo "Example: exnos_ofs_launch.sh.sms cbofs nowcast"

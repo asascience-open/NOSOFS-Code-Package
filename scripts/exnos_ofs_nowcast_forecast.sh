@@ -17,9 +17,10 @@
 # Modification History:
 #     Degui Cao     02/18/2010   
 # ##########################################################################
-
-set -x
+# set -x
 #PS4=" \${SECONDS} \${0##*/} L\${LINENO} + "
+
+errors=0
 
 #  Control Files For Model Run
 if [ -s ${FIXofs}/${PREFIXNOS}.ctl ]
@@ -27,6 +28,7 @@ then
   . ${FIXofs}/${PREFIXNOS}.ctl
   if [ -n "$LSB_DJOB_NUMPROC" ] && [ $TOTAL_TASKS -ne $LSB_DJOB_NUMPROC ]; then
     err_exit "Number of tasks/CPUs ($LSB_DJOB_NUMPROC) does not meet job requirements (see ${FIXofs}/${PREFIXNOS}.ctl)."
+    ((errors++))
   fi
 else
   echo "${RUN} control file is not found, FATAL ERROR!"
@@ -39,12 +41,14 @@ else
   postmsg "$nosjlogfile" "$msg"
   echo "${RUN} control file is not found, FATAL ERROR!"  >> $cormslogfile
   err_chk
+  ((errors++))
 fi
 
 echo "run the launch script to set the NOS configuration"
-. $USHnos/nos_ofs_launch.sh $OFS nowcast
 export pgm="$USHnos/nos_ofs_launch.sh $OFS nowcast"
-export err=$?
+
+# The below script is sourced and will set err
+. $USHnos/nos_ofs_launch.sh $OFS nowcast
 if [ $err -ne 0 ]
 then
    echo "Execution of $pgm did not complete normally, FATAL ERROR!"
@@ -53,6 +57,7 @@ then
    postmsg "$jlogfile" "$msg"
    postmsg "$nosjlogfile" "$msg"
    err_chk
+   ((errors++))
 else
    echo "Execution of $pgm completed normally" >> $cormslogfile
    echo "Execution of $pgm completed normally"
@@ -81,6 +86,7 @@ then
    postmsg "$jlogfile" "$msg"
    postmsg "$nosjlogfile" "$msg"
    err_chk
+   ((errors++))
 else
    echo "Execution of $pgm completed normally" >> $cormslogfile
    echo "Execution of $pgm completed normally"
@@ -101,6 +107,7 @@ then
    postmsg "$jlogfile" "$msg"
    postmsg "$nosjlogfile" "$msg"
    err_chk
+   ((errors++))
 else
    echo "Execution of $pgm completed normally" >> $cormslogfile
    echo "Execution of $pgm completed normally"
@@ -112,7 +119,7 @@ fi
 # if [ $envir = "dev" ]; then
 #   $USHnos/nos_ofs_sftp.sh $runtype
 # fi
- echo "end of $runtype"
+echo "end of $runtype"
 
 if [ $LEN_FORECAST -gt 0 ] 
 then
@@ -137,6 +144,7 @@ then
    postmsg "$jlogfile" "$msg"
    postmsg "$nosjlogfile" "$msg"
    err_chk
+   ((errors++))
 else
    echo "Execution of $pgm completed normally" >> $cormslogfile
    echo "Execution of $pgm completed normally"
@@ -158,6 +166,7 @@ then
    postmsg "$jlogfile" "$msg"
    postmsg "$nosjlogfile" "$msg"
    err_chk
+   ((errors++))
 else
    echo "Execution of $pgm completed normally" >> $cormslogfile
    echo "Execution of $pgm completed normally"
@@ -178,3 +187,5 @@ fi
           echo "END OF NOWCAST/FORECAST SUCCESSFULLY"
           echo "                                    "
 ###############################################################
+
+exit $errors
