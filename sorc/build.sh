@@ -1,5 +1,7 @@
 #!/bin/sh
 # set -x 
+set -e
+
 #############################################################################
 #                                                                             #
 # Compiles source codes of nosofs, moves executables to exec and cleans up    #
@@ -34,11 +36,8 @@ export LIBnos=$HOMEnos/lib
 module purge
 printenv SHELL
 
-set +x
 module use -a $HOMEnos/modulefiles
-#module load wcoss2_prod
 module load intel_x86_64
-set -x
 
 if [ ! -s $EXECnos ]
 then
@@ -50,22 +49,12 @@ then
   mkdir -p $LIBnos
 fi
 
-# 5. Compile ocean models of FVCOM-based OFS
-# leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs
-cd $SORCnos/FVCOM.fd
-./COMPILE_FVCOM.sh
-
-exit
 
 # 2. Create all executions of nosofs framework (COMF) 
 cd $SORCnos
 fcodes=`ls -d nos*.fd | sed 's/\.fd//g'`
 echo "fcodes: "
 echo "$fcodes"
-
-echo "debugging not building all of the prep stuff"
-#err png lib  nos_ofs_create_forcing_met
-#err png nos_ofs_create_forcing_met_fvcom
 
 fcodes="
 nos_creofs_wl_offset_correction
@@ -76,10 +65,8 @@ nos_ofs_read_restart_fvcom
 nos_ofs_reformat_ROMS_CTL
 nos_ofs_rename
 nos_ofs_residual_water_calculation
-nos_ofs_utility
-"
-
-morefcodes="
+nos_ofs_create_forcing_met
+nos_ofs_create_forcing_met_fvcom
 nos_ofs_create_forcing_nudg
 nos_ofs_create_forcing_obc
 nos_ofs_create_forcing_obc_fvcom
@@ -93,18 +80,18 @@ echo " FORTRAN codes found: "${fcodes}.f
 if [ $# -eq 0 ]; then
 
   # nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
-#  cd $SORCnos/nos_ofs_utility.fd
-#  make clean
-#  make
-#  result=$?
-#  if [ $result -ne 0 ]; then
-#    echo "ERROR building nos_ofs_utility.fd"
-#    exit $result
-#  else
-#    echo "SUCCESS: nos_ofs_utility.fd built"
-#  fi
-#  make install
-#  make clean
+  cd $SORCnos/nos_ofs_utility.fd
+  make clean
+  make
+  result=$?
+  if [ $result -ne 0 ]; then
+    echo "ERROR building nos_ofs_utility.fd"
+    exit $result
+  else
+    echo "SUCCESS: nos_ofs_utility.fd built"
+  fi
+  make install
+  make clean
 
   for code in $fcodes ; do
     if [ $code != "nos_ofs_utility" ]; then	   
@@ -129,6 +116,7 @@ if [ $# -eq 0 ]; then
   done   
 fi
 
+
 # 3. Create all executions with debug for nosofs framework (COMF)
 if [ "$1" = "debug" ]; then
 #  nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes
@@ -149,13 +137,12 @@ if [ "$1" = "debug" ]; then
    done
 fi
 
-exit
+
 # 4. Compile ocean models of ROMS-based OFS 
 # cbofs, dbofs, tbofs,ciofs, gomofs, wcofs, wcofs_da, wcofs_free
 cd $SORCnos/ROMS.fd
 ./COMPILE_ROMS.sh
 
-exit
 
 # 5. Compile ocean models of FVCOM-based OFS
 # leofs, lmhofs, loofs, lsofs, sfbofs,ngfos2, sscofs

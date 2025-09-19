@@ -1,5 +1,7 @@
 #!/bin/sh
-# set -x
+#set -x
+
+# Coastal Modeling Cloud Sandbox - adapted from JNOS_OFS_NOWCST_FCST
 
 if [ $# -ne 2 ] ; then
   echo "Usage: $0 YYYYMMDD HH"
@@ -12,26 +14,25 @@ HH=$2
 export HOMEnos=$(dirname $PWD)
 
 # YES will not delete /ptmp run directory, useful when debugging
-#export KEEPDATA=NO
-export KEEPDATA=YES
+export KEEPDATA=NO
+#export KEEPDATA=YES
 
 NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
 
+# Use the intel OFI library
 export I_MPI_OFI_LIBRARY_INTERNAL=1
+# Will display the fabric details when run starts
+export I_MPI_DEBUG=1
 
 # Make metis and other libraries visible by ld
 export LD_LIBRARY_PATH=$HOMEnos/lib:$LD_LIBRARY_PATH
 
 module use -a $HOMEnos/modulefiles
 module load intel_x86_64
-
 module list
 
-export I_MPI_DEBUG=1
-
 export OFS=${OFS:-cbofs}
-#export PREFIXNOS="nosofs.$OFS"
 export PREFIXNOS=$OFS
 
 NOWCAST=${NOWCAST:-NO}      # Run the nowcast?
@@ -51,9 +52,6 @@ if [[ "$OFS" == "ngofs2" ]] ; then
 fi
 
 export MPIOPTS=${MPIOPTS:-"-np $NPP -ppn $PPN "}
-
-NOWCAST=NO      # Run the nowcast?
-FORECAST=YES    # Run the forecast?
 
 export cyc=${HH}
 export nosofs_ver=v3.6.6
