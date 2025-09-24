@@ -37,12 +37,6 @@ regsub {\n$} $METIS {} METIS
 setenv METIS $METIS
 prepend-path LD_LIBRARY_PATH "$env(METIS)/lib"
 
-
-# /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/intel-2021.9.0/metis-5.1.0-fdsd6irtc7ukcwpy4ehuwsgxwqd5g33z/
-
-# png
-# /mnt/efs/fs1/save/environments/spack.v0.22.5/opt/spack/__spack_path_place/linux-rhel8-x86_64/oneapi-2023.1.0/libpng-1.6.39-n3gzlbgf6k3ldkwgan4q25kzpbbissva/
-
 setenv MPI_INC "$env(I_MPI_ROOT)/include"
 
 # Loding nceplibs modules
@@ -66,25 +60,18 @@ setenv NETCDFC $netcdfc
 prepend-path LD_LIBRARY_PATH "$env(NETCDF)/lib"
 prepend-path LD_LIBRARY_PATH "$env(NETCDFC)/lib"
 
+# The following are needed for makefiles, will break if spack finds more than one match
 set JASPER [exec spack location -i jasper]
 regsub {\n$} $JASPER {} JASPER
 setenv JASPER_LIB "-L$JASPER/lib64 -ljasper"
 
 set BACIO [exec spack location -i bacio]
 regsub {\n$} $BACIO {} BACIO
-#setenv BACIO_LIB4 "$BACIO/lib -libbacio_4.a"
 setenv BACIO_LIB4 "-L$BACIO/lib -lbacio_4"
 
 set PNG [exec spack location -i libpng]
 regsub {\n$} $PNG {} PNG
 setenv PNG_LIB "-L$PNG/lib64 -lpng"
-
-
-# spack NCEPLIBS modules do not export all of these
-# LIB  = ${G2_LIB4} 
-#${W3NCO_LIB4} ${W3EMC_LIB4} \
-# $(NOS_UTILITY_LIB) ${JASPER_LIB} $(PNG_LIB) ${Z_LIB} ${BACIO_LIB4}
-# LIBS  = $(NETCDF_LIB) $(LIB)
 
 
 
