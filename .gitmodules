@@ -6,3 +6,7 @@
 	path = sorc/FVCOM.dev.fd
 	url = https://github.com/asascience/FVCOM.git
 	branch = ioos-sb-coops-dev
+[submodule "sorc/ROMS.eccofs"]
+	path = sorc/ROMS.eccofs
+	url = https://github.com/asascience-open/roms.git
+	branch = ioos-sandbox-eccofs

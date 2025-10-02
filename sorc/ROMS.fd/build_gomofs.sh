@@ -277,7 +277,7 @@ fi
 # etc).
 
 # export     MY_HEADER_DIR=${MY_PROJECT_DIR}/ROMS/Include
- export     MY_HEADER_DIR=${HOMEnos}/include 
+ export     MY_HEADER_DIR=${HOMEnos}/include
  export MY_ANALYTICAL_DIR=${MY_PROJECT_DIR}
 
 # Put the binary to execute in the following directory.

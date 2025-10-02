@@ -101,18 +101,26 @@ if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]; then
 fi
 
 if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
-  if [ ! -s ${HOMEnos}/sorc/ROMS.fd/ROMS/External/varinfo.yaml ]; then
+
+  if [ ${OFS} == "eccofs" ]; then
+    echo "PT adding temporary one-off for eccofs development ROMS.eccofs instead of ROMS.fd folder"
+    ROMSsrc='ROMS.eccofs'
+  else
+    ROMSsrc='ROMS.fd'
+  fi
+
+  if [ ! -s ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml ]; then
     echo "ROMS varinfo.yaml is not found"
-    echo "please provide file of ${HOMEnos}/sorc/ROMS.fd/ROMS/External/varinfo.yaml"
-    echo "please provide file of ${HOMEnos}/sorc/ROMS.fd/ROMS/External/varinfo.yaml" >> $cormslogfile
-    msg="FATAL ERROR: ${HOMEnos}/ROMS.fd/sorc/ROMS/External/varinfo.yaml does not exist, FATAL ERROR!"
+    echo "please provide file of ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml"
+    echo "please provide file of ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml" >> $cormslogfile
+    msg="FATAL ERROR: ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml does not exist, FATAL ERROR!"
     postmsg "$jlogfile" "$msg"
     postmsg "$nosjlogfile" "$msg"
     exit 2
   else
-    cp -p ${HOMEnos}/sorc/ROMS.fd/ROMS/External/varinfo.yaml $DATA/.
+    cp -p ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml $DATA/.
     export err=$?; err_chk
-    echo " ${HOMEnos}/sorc/ROMS.fd/ROMS/External/varinfo.yaml was copied into working dir"
+    echo " ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml was copied into working dir"
   fi
 fi
 
