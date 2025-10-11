@@ -50,6 +50,7 @@ export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
 
 models='cbofs ciofs dbofs gomofs tbofs wcofs wcofs_free'
+models='eccofs'
 
 for model in $models
 do

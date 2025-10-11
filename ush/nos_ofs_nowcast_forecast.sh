@@ -86,18 +86,9 @@ RUN=$OFS
 time_hotstart=${PDY}${cyc}
 
 echo "************************************************"
-echo "************************************************"
-echo "************************************************"
-echo "************************************************"
-echo "************************************************"
 echo ""
 echo "time_hotstart is $time_hotstart"
 echo ""
-echo "************************************************"
-echo "************************************************"
-echo "************************************************"
-echo "************************************************"
-echo "************************************************"
 echo "************************************************"
 
 if [ -s $COMOUT/time_hotstart.${cycle} ]; then
@@ -147,15 +138,6 @@ then
   then
      cp -p ${FIXofs}/${PREFIXNOS}_rivernamelist.nml $DATA/RIVERS_NAMELIST.nml
   fi
-  if [ "${OFS,,}" == "ngofs" ]; then
-     if [ -s ${FIXofs}/nos_${RUN}_nestnode_negofs.dat ]; then
-        cp -p ${FIXofs}/nos_${RUN}_nestnode_negofs.dat $DATA/nos_${RUN}_nestnode_negofs.dat
-     fi
-     if [ -s ${FIXofs}/nos_${RUN}_nestnode_nwgofs.dat ]; then
-        cp -p ${FIXofs}/nos_${RUN}_nestnode_nwgofs.dat $DATA/nos_${RUN}_nestnode_nwgofs.dat
-     fi
-
-  fi   
   if [ -d ${FIXofs}/$STA_EDGE_CTL -o ! -s ${FIXofs}/$STA_EDGE_CTL ]; then
     echo "${FIXofs}/$STA_EDGE_CTL is not found"
     echo "$STA_EDGE_CTL will be created in FVCOM "
@@ -321,15 +303,6 @@ then
   then
   cp -p $FIXofs/${PREFIXNOS}.bctides.in $DATA/bctides.in 
   fi
-fi
-
-if [ "${OFS,,}" == "nwgofs" ]; then
-     if [ -s ${FIXofs}/${PREFIXNOS}_dam_cell.dat ]; then
-        cp -p ${FIXofs}/${PREFIXNOS}_dam_cell.dat $DATA/${RUN}_dam_cell.dat
-     fi
-     if [ -s ${FIXofs}/${PREFIXNOS}_dam_node.dat ]; then
-        cp -p ${FIXofs}/${PREFIXNOS}_dam_node.dat $DATA/${RUN}_dam_node.dat
-     fi
 fi
 
 if [ -s ${FIXofs}/${PREFIXNOS}_z0_vary.nc ]; then
@@ -1322,7 +1295,8 @@ then
 
   fi
 # 1.a RIVER FORCING FILE 
-  if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]
+  #PT skipping check for eccofs dev
+  if [[ ${OCEAN_MODEL,,} == "roms" && "${RUN,,}" != "eccofs" ]]
   then
     if [ -s $DATA/$RIVER_FORCING_FILE ]
     then
@@ -1444,7 +1418,10 @@ then
       cp -p $COMOUT/$OBC_FORCING_FILE_EL $OBC_FORCING_FILE_EL
       cp -p $COMOUT/$OBC_FORCING_FILE_TS $OBC_FORCING_FILE_TS
     else
-     if [ ${RUN}=! "lsofs" -a ${RUN}=! "LSOFS" -a ${RUN}=! "loofs"  -a ${RUN}=! "LOOFS" ]; then	    
+
+     # if [ ${RUN} != "lsofs" -a ${RUN} != "LSOFS" -a ${RUN} != "loofs"  -a ${RUN} != "LOOFS" ]; then	    
+     #PT ECCOFS dev - skipping check for OBC forcing file
+     if [ ${RUN,,} != "lsofs" -a ${RUN,,} != "loofs" -a ${RUN,,} != "eccofs" ]; then
       msg="FATAL ERROR: NO OBC FORCING FILE $OBC_FORCING_FILE"
       postmsg "$jlogfile" "$msg"
       postmsg "$nosjlogfile" "$msg"
@@ -1497,6 +1474,8 @@ then
     elif [ -s $COMOUT/$MET_NETCDF_1_FORECAST ]
     then
       cp -p $COMOUT/$MET_NETCDF_1_FORECAST $MET_NETCDF_1_FORECAST
+    elif [ ${RUN,,} == "eccofs" ]; then
+      echo "PT ECCOFS Dev: skipping MET Forcing check"
     else
       msg="FATAL ERROR: NO Meteorological Forcing For forecast $MET_NETCDF_1_FORECAST"
       postmsg "$jlogfile" "$msg"
@@ -1524,7 +1503,6 @@ then
   fi
 
 # 1.h forecast cntl file
-echo "DEBUGGING -----------------------------------------------"
   if [ -f $DATA/${RUN}_${OCEAN_MODEL}_forecast.in ]
   then
     echo "   $DATA/${RUN}_${OCEAN_MODEL}_forecast.in existed "
@@ -1580,7 +1558,10 @@ echo "DEBUGGING -----------------------------------------------"
 #PT  I am not sure why the fix/ .ctl files set this to a generic ofs.roms.tides.nc file
 #PT Mismatch between what is in roms.in file and what is expected by the scripts
 #PT DATA is PTMP
-  if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]
+  #if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms"]
+
+  #PT skipping check for eccofs dev
+  if [[ ${OCEAN_MODEL,,} == "roms" && ${OFS,,} != "eccofs" ]]
   then
      if [ -f $DATA/$HC_FILE_OFS ]; then
        echo "   $DATA/$HC_FILE_OFS existed "
@@ -1638,6 +1619,16 @@ echo "DEBUGGING -----------------------------------------------"
     elif [ -s $COMOUT/$RST_OUT_NOWCAST ]
     then
       cp -p $COMOUT/$RST_OUT_NOWCAST $RST_OUT_NOWCAST
+    elif [ ${RUN} == "eccofs" ]; then
+      echo "PT ECCOFS Dev - special case for RESTART/INI file"
+      if [ -f $DATA/$INI_FILE_FORECAST ]; then
+        echo "   $DATA/$INI_FILE_FORECAST existed " 
+      elif [ -s $COMOUT/$INI_FILE_FORECAST ]; then
+        cp -p $COMOUT/$INI_FILE_FORECAST $INI_FILE_FORECAST
+      else
+        #TODO: This will be updated later for the NOS/IOOS Sandbox
+        echo "ECCOFS Dev - no restart file - assuming coldstart"
+      fi
     else
       msg="FATAL ERROR: NO Restart file for Forecast"
       postmsg "$jlogfile" "$msg"
@@ -1706,6 +1697,7 @@ echo "DEBUGGING -----------------------------------------------"
        cp ${RUN}.status $COMOUT/.
        cp -p ${RUN}.status $COMOUT/${RUN}.status_${cyc}
     fi
+
 ## separate HIS output file into multiple smaller files
 #AJ 02/26/2015       Im1=0
     Im1=0   #for new version of ROMS which doesn't ouput hour=0 (initial time)
@@ -1726,7 +1718,7 @@ echo "DEBUGGING -----------------------------------------------"
     if [ -f ${PREFIXNOS}*.avg.nc ]; then
       mv ${PREFIXNOS}*.avg.nc ${PREFIXNOS}.t${cyc}z.${PDY}.avg.forecast.nc
     fi
-#######################
+
     NFILE=`find . -name "${PREFIXNOS}*.fields.forecast*.nc" | wc -l`
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 3d "$time_nowcastend" "$time_nowcastend"
@@ -1735,6 +1727,18 @@ echo "DEBUGGING -----------------------------------------------"
     if [ $NFILE -gt 0 ]; then
       $USHnos/nos_ofs_rename.sh $OFS $OCEAN_MODEL $RUNTYPE 2d "$time_nowcastend" "$time_nowcastend"
     fi
+
+    if [[ ${RUN} == "eccofs" ]]; then
+      echo "PT ECCOFS Dev copying files to $COMOUT"
+      cp -p eccofs6km_xtr*.nc ${COMOUT}
+      cp -p eccofs_*.nc ${COMOUT}
+      cp -p eccofs*rst.nc ${COMOUT}
+    fi
+  ##############
+  ## end if ROMS
+  ##############
+
+
   elif [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]
   then
     rm -f $MODEL_LOG_FORECAST
@@ -1807,7 +1811,6 @@ echo "DEBUGGING -----------------------------------------------"
         NCSF_OUT_INTERVAL=${NCSF_OUT_INTERVAL%.*} # just tuncate the integer part and remove the fractional part   
         NHIS_INTERVAL=`expr $NC_OUT_INTERVAL / 3600`
         NQCK_INTERVAL=`expr $NCSF_OUT_INTERVAL / 3600`
-
       fi
     else
         echo "${RUN} FORECAST RUN OF CYCLE t${HH}z ON $YYYY$MM$DD FAILED 00"  >> $cormslogfile 
@@ -1815,16 +1818,10 @@ echo "DEBUGGING -----------------------------------------------"
         ((errors++))
         export err=99; err_chk
     fi  
+  ##############
+  # end if FVCOM
+  ##############
 
-#    if [ ${OFS} == "NGOFS" -o ${OFS} == "ngofs" ]; then
-#       if [ -s nos_${RUN}_nestnode_negofs.nc ]; then
-#          cp -p nos_${RUN}_nestnode_negofs.nc $COMOUT/${PREFIXNOS}.nestnode.negofs.forecast.$PDY.t${cyc}z.nc
-#       fi
-#       if [ -s nos_${RUN}_nestnode_nwgofs.nc ]; then
-#          cp -p nos_${RUN}_nestnode_nwgofs.nc $COMOUT/${PREFIXNOS}.nestnode.nwgofs.forecast.$PDY.t${cyc}z.nc
-#       fi
-#    fi
- 
 
   elif [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]
   then
@@ -2002,8 +1999,12 @@ echo "DEBUGGING -----------------------------------------------"
        echo $YYYY$MM$DD$HH > ${OFS}.status
        cp ${OFS}.status $COMOUT/.
        cp -p ${RUN}.status $COMOUT/${RUN}.status_${cyc}
-  
   fi
+  ##############
+  # end if SELFE
+  ##############
+
+
 #save 3D forecast field output file into COMOUT
   cd $DATA
   for combinefields in `ls ${DATA}/${PREFIXNOS}*.fields.f*.nc`
@@ -2018,6 +2019,7 @@ echo "DEBUGGING -----------------------------------------------"
       cp -p ${combinefields} ${COMOUT}/.
     done
   fi
+
 #save forecast station output file into COMOUT
   cp -p $DATA/$STA_OUT_FORECAST  ${COMOUT}/$STA_OUT_FORECAST
   if [ -s $DATA/${PREFIXNOS}*.avg.forecast.nc ]; then
@@ -2027,7 +2029,7 @@ echo "DEBUGGING -----------------------------------------------"
 #save the log to COMOUT
   cp -p $DATA/${MODEL_LOG_FORECAST} $COMOUT/${MODEL_LOG_FORECAST}
 
-fi 
+fi # end if forecast
 
 # --------------------------------------------------------------------------- #
 # 4.  Ending output

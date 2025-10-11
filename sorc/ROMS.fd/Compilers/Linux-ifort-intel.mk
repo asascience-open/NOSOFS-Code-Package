@@ -106,7 +106,7 @@ ifdef CICE_APPLICATION
            FFLAGS += -g
            FFLAGS += -check all
  else
-           FFLAGS := -ip -O3
+           FFLAGS += -ip -O3
  endif
 endif
 

@@ -14,8 +14,8 @@ HH=$2
 export HOMEnos=$(dirname $PWD)
 
 # YES will not delete /ptmp run directory, useful when debugging
-export KEEPDATA=NO
-#export KEEPDATA=YES
+# export KEEPDATA=NO
+export KEEPDATA=YES
 
 NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
@@ -179,7 +179,7 @@ set -x
 
 env  
 ##############################################
-# Check if this is for restarting forecast run
+# this is for restarting fvcom forecast run
 ##############################################
 CONTINUE_FORECAST=NO
 CONTINUE_FORECAST_FILE=${RUN}_CONTINUE_FORECAST.t${cyc}z

@@ -41,7 +41,7 @@
 #        Purpose: For Upgraded NGOFS Implementation
 #
 #### END of Unix Script DOC BLOCK--------------------------------------------------- 
-# set -x
+#set -x
 
 if [ $# -lt 2 ];  then
   echo " ***Error: You must supply at least two arguments for model run " 
@@ -84,6 +84,7 @@ else
   echo "${FIXofs}/$GRIDFILE is copied into working dir"  
 fi
 
+# == is bash only, maybe use the simplified {VARIABLE,,} == "lowercase" form (bash >= v4)?
 if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]; then
   if [ ! -d $DATA/outputs ]; then
     mkdir -p $DATA/outputs
@@ -102,7 +103,7 @@ fi
 
 if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
 
-  if [ ${OFS} == "eccofs" ]; then
+  if [ ${RUN} == "eccofs" ]; then
     echo "PT adding temporary one-off for eccofs development ROMS.eccofs instead of ROMS.fd folder"
     ROMSsrc='ROMS.eccofs'
   else
@@ -118,9 +119,14 @@ if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then
     postmsg "$nosjlogfile" "$msg"
     exit 2
   else
-    cp -p ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml $DATA/.
-    export err=$?; err_chk
-    echo " ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml was copied into working dir"
+    # PT ECCOFS Dev - setting this explicitly to VARINFO == /com/eccofs/input/varinfo.yaml for now
+    if [ ${RUN} == "eccofs" ]; then
+      echo "PT ECCOFS Dev - not copying varinfo.yaml, VARINFO == /com/eccofs/input/varinfo.yaml for now"
+    else
+      cp -p ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml $DATA/.
+      export err=$?; err_chk
+      echo " ${HOMEnos}/sorc/${ROMSsrc}/ROMS/External/varinfo.yaml was copied into working dir"
+    fi
   fi
 fi
 
@@ -160,6 +166,7 @@ if [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]; then
   fi
   fi
 fi
+
 
 if [ -d ${FIXofs}/$NWM_REACHID_FILE -o ! -s ${FIXofs}/$NWM_REACHID_FILE ]; then
   echo "WARNING: ${FIXofs}/$NWM_REACHID_FILE is not found"
@@ -321,7 +328,13 @@ fi
 export HH=$cyc
 export PDY1=$PDY
 
+
+##
+##  -------------------------------------------------'
 ##  For prep Only -----------------------------------'
+##  -------------------------------------------------'
+##
+##
 if [ "$runtype" = "prep" ] || [ "$runtype" = "PREP" ]; then 
 # copy all shared static files into DATA/WORK Dirctory
 
@@ -582,9 +595,8 @@ if [ "$runtype" = "prep" ] || [ "$runtype" = "PREP" ]; then
     fi
     export pgm=nos_ofs_read_restart
 
-#PT Skipping prep_step on sandbox
+    . prep_step
 
-# . prep_step
     if [ ${OCEAN_MODEL} == "ROMS" -o ${OCEAN_MODEL} == "roms" ]; then 
       $EXECnos/nos_ofs_read_restart < Fortran_read_restart.ctl > Fortran_read_restart.log
       export err=$?
@@ -755,8 +767,11 @@ if [ "$runtype" = "prep" ] || [ "$runtype" = "PREP" ]; then
             cat $COMOUT/${RUN}.${cycle}.usgsbufr.emailbody | mail.py -s "$subject" $maillist -v
     fi
 fi
-
+##
+##
 ## -- End of prep Only --------------------------------'
+##
+##
 
 export OBC_FORCING_FILE=${PREFIXNOS}.${cycle}.${PDY1}.obc.nc
 export OBC_FORCING_FILE_EL=${PREFIXNOS}.${cycle}.${PDY1}.obc.el.nc
@@ -787,9 +802,14 @@ export MODEL_LOG_NOWCAST=${PREFIXNOS}.${cycle}.${PDY1}.nowcast.log
 export MODEL_LOG_FORECAST=${PREFIXNOS}.${cycle}.${PDY1}.forecast.log
 export RUNTIME_CTL_NOWCAST=${PREFIXNOS}.${cycle}.${PDY1}.nowcast.in
 export RUNTIME_CTL_FORECAST=${PREFIXNOS}.${cycle}.${PDY1}.forecast.in
-echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
-echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
-echo "DEBUGGING ------------- RUNTIME_CTL_FORECAST: $RUNTIME_CTL_FORECAST"
+
+
+if [ ${OFS} == "eccofs" ]; then
+  echo "PT ECCOFS Dev - setting RST INI file"
+  export INI_FILE_FORECAST=${PREFIXNOS}.${PDY1}.ini.nc
+  # TODO: can improve this later to match production like system where previous day exists on /com
+  # eccofs.20190101.rst.nc gets copied to eccofs.20190102.ini.nc in getICs step on IOOS/NOS Sandboxes
+fi
 
 if [ -z "${OFS##wcofs_da*}" ]; then
   export COMOUTrst1=$COMrst/${OFS_NF}.${PDY1}
@@ -804,6 +824,7 @@ if [ -z "${OFS##wcofs_da*}" ]; then
   export RST_OUT_NOWCAST_NF2=${OFS_NF}.t${HH_NF}z.${PDY_NF}.rst.nowcast.nc
   export COMOUTrst2=$COMrst/${OFS_NF}.$PDY_NF
 fi
+
 if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]; then
   export MET_NETCDF_1_NOWCAST=${PREFIXNOS}.${cycle}.${PDY1}.met.nowcast.nc.tar
   export MET_NETCDF_1_FORECAST=${PREFIXNOS}.${cycle}.${PDY1}.met.forecast.nc.tar
@@ -825,6 +846,7 @@ if [ ${OCEAN_MODEL} == "SELFE" -o ${OCEAN_MODEL} == "selfe" ]; then
 elif [ ${OCEAN_MODEL} == "FVCOM" -o ${OCEAN_MODEL} == "fvcom" ]; then
   export RIVER_FORCING_FILE=${PREFIXNOS}.${cycle}.${PDY1}.river.nc.tar
 fi
+
 export RST_FILE=$RST_FILE
 echo "Variable and parameter setup has been completed" >> $jlogfile
 echo "Variable and parameter setup has been completed" >> $nosjlogfile
