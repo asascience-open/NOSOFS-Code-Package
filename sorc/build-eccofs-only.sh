@@ -33,6 +33,12 @@ export SORCnos=$HOMEnos/sorc
 export EXECnos=$HOMEnos/exec
 export LIBnos=$HOMEnos/lib
 
+if [[ $(nproc) -eq 1 || $(nproc) -eq 2 ]]; then
+    JOBS=1
+else
+    JOBS=$(($(nproc) - 1))
+fi
+
 module purge
 printenv SHELL
 
@@ -71,7 +77,7 @@ if [ $# -eq 0 ]; then
   # nos_ofs_utility has to be compiled first because libnosutil.a is used by other Fortran codes	
   cd $SORCnos/nos_ofs_utility.fd
   make clean
-  make
+  make --jobs=$JOBS
   result=$?
   if [ $result -ne 0 ]; then
     echo "ERROR building nos_ofs_utility.fd"
@@ -91,7 +97,7 @@ if [ $# -eq 0 ]; then
       echo "-------------------------------------"
       cd $SORCnos/${code}.fd
       make clean
-      make 
+      make --jobs=$JOBS
       result=$?
       if [ $result -ne 0 ]; then
         echo "ERROR building ${code}.fd"

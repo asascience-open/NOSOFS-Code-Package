@@ -20,17 +20,25 @@ export KEEPDATA=YES
 NOWCAST=NO      # Run the nowcast?
 FORECAST=YES    # Run the forecast?
 
-# Use the intel OFI library
-export I_MPI_OFI_LIBRARY_INTERNAL=1
-# Will display the fabric details when run starts
-export I_MPI_DEBUG=1
-
 # Make metis and other libraries visible by ld
 export LD_LIBRARY_PATH=$HOMEnos/lib:$LD_LIBRARY_PATH
 
 module use -a $HOMEnos/modulefiles
 module load intel_x86_64
 module list
+
+# Use the intel OFI library
+# export I_MPI_OFI_LIBRARY_INTERNAL=1
+# Will display the fabric details when run starts
+
+export I_MPI_DEBUG=1
+export I_MPI_DEBUG=4
+export I_MPI_OFI_LIBRARY_INTERNAL=0   # 0: use aws efa fabric 1: use intel efa fabric
+export I_MPI_OFI_PROVIDER_DUMP=1
+
+export FI_PROVIDER=efa
+export I_MPI_FABRICS=ofi
+export I_MPI_OFI_PROVIDER=efa
 
 export OFS=${OFS:-cbofs}
 export PREFIXNOS=$OFS
